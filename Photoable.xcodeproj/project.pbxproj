@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		2B5016AD2952068400547019 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016AC2952068400547019 /* AppDelegate.swift */; };
 		2B5016AF2952068400547019 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016AE2952068400547019 /* SceneDelegate.swift */; };
-		2B5016B12952068400547019 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016B02952068400547019 /* ViewController.swift */; };
+		2B5016B12952068400547019 /* PhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016B02952068400547019 /* PhotosViewController.swift */; };
 		2B5016B42952068400547019 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B5016B22952068400547019 /* Main.storyboard */; };
 		2B5016B62952068600547019 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2B5016B52952068600547019 /* Assets.xcassets */; };
 		2B5016B92952068600547019 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B5016B72952068600547019 /* LaunchScreen.storyboard */; };
@@ -19,7 +19,7 @@
 		2B5016A92952068400547019 /* Photoable.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photoable.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B5016AC2952068400547019 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B5016AE2952068400547019 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		2B5016B02952068400547019 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		2B5016B02952068400547019 /* PhotosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosViewController.swift; sourceTree = "<group>"; };
 		2B5016B32952068400547019 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2B5016B52952068600547019 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2B5016B82952068600547019 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -56,15 +56,39 @@
 		2B5016AB2952068400547019 /* Photoable */ = {
 			isa = PBXGroup;
 			children = (
+				2B5A5B47298A378D0081CF56 /* Model */,
+				2B5A5B46298A37890081CF56 /* View */,
+				2B5A5B42298A36380081CF56 /* Controller */,
 				2B5016AC2952068400547019 /* AppDelegate.swift */,
 				2B5016AE2952068400547019 /* SceneDelegate.swift */,
-				2B5016B02952068400547019 /* ViewController.swift */,
-				2B5016B22952068400547019 /* Main.storyboard */,
 				2B5016B52952068600547019 /* Assets.xcassets */,
-				2B5016B72952068600547019 /* LaunchScreen.storyboard */,
 				2B5016BA2952068600547019 /* Info.plist */,
 			);
 			path = Photoable;
+			sourceTree = "<group>";
+		};
+		2B5A5B42298A36380081CF56 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				2B5016B02952068400547019 /* PhotosViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		2B5A5B46298A37890081CF56 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				2B5016B22952068400547019 /* Main.storyboard */,
+				2B5016B72952068600547019 /* LaunchScreen.storyboard */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		2B5A5B47298A378D0081CF56 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,7 +162,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2B5016B12952068400547019 /* ViewController.swift in Sources */,
+				2B5016B12952068400547019 /* PhotosViewController.swift in Sources */,
 				2B5016AD2952068400547019 /* AppDelegate.swift in Sources */,
 				2B5016AF2952068400547019 /* SceneDelegate.swift in Sources */,
 			);

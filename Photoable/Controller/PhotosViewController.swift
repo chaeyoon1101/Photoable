@@ -15,42 +15,83 @@ class PhotosViewController: UIViewController {
         super.viewDidLoad()
         
         setUILayout()
-        pickPhoto()
         configurationCollectionView()
         // Do any additional setup after loading the view.
     }
     
-    private func getPermissionIfNecessary(completion: @escaping (Bool) -> (Void)) {
-        switch PHPhotoLibrary.authorizationStatus() {
-        case .notDetermined:
+    override func viewDidAppear(_ animated: Bool) {
+        getPermissionIfNecessary()
+    }
+    
+    private func getPermissionIfNecessary() {
+        switch PHPhotoLibrary.authorizationStatus(for: .readWrite) {
+        case .authorized, .limited:
+            pickPhoto()
+            
+        case .denied:
+            print("======== denied ===========")
+            let actions = [
+                AlertModel(title: "설정 변경하러 가기", style: .default, handler: { _ in
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }),
+                AlertModel(title: "확인", style: .default, handler: { _ in print("확인") })
+            ]
+            DispatchQueue.main.async {
+                self.alert(title: "사진 접근 권한", message: "사진 접근 권한이 거부 되었어요", actions: actions)
+            }
+            
+        case .restricted, .notDetermined:
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-                if status == .authorized {
-                    completion(true)
+                switch status {
+                case .authorized, .limited:
+                    self.pickPhoto()
+                case .notDetermined, .restricted:
+                    let actions = [
+                        AlertModel(title: "설정 변경하러 가기", style: .default, handler: { _ in
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(url)
+                            }
+                        }),
+                        AlertModel(title: "확인", style: .default, handler: { _ in print("확인") })
+                    ]
+                    DispatchQueue.main.async {
+                        self.alert(title: "사진 접근 권한", message: "사진 접근 권한이 허용 되지 않았어요", actions: actions)
+                    }
+                   
+                case .denied:
+                    let actions = [
+                        AlertModel(title: "설정 변경하러 가기", style: .default, handler: { _ in
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(url)
+                            }
+                        }),
+                        AlertModel(title: "확인", style: .default, handler: { _ in print("확인") })
+                    ]
+                    DispatchQueue.main.async {
+                        self.alert(title: "사진 접근 권한", message: "사진 접근 권한이 거부 되었어요", actions: actions)
+                    }
+                
+                @unknown default:
+                    break
                 }
             }
-        case .authorized:
-            completion(true)
-        default:
-            completion(false)
+        @unknown default:
+            break
         }
     }
     
     private func pickPhoto() {
-        getPermissionIfNecessary { permission in
-            if permission {
-                let allPhotosOptions = PHFetchOptions()
-                
-                allPhotosOptions.sortDescriptors = [
-                    NSSortDescriptor(key: "creationDate", ascending: false)
-                ]
-                
-                self.photos = PHAsset.fetchAssets(with: allPhotosOptions)
-                
-                self.photosCollectionView.reloadData()
-            } else {
-                // 권한이 허용되지 않았다고 alert 띄우기
-            }
-        }
+        let allPhotosOptions = PHFetchOptions()
+        
+        allPhotosOptions.sortDescriptors = [
+            NSSortDescriptor(key: "creationDate", ascending: false)
+        ]
+        
+        self.photos = PHAsset.fetchAssets(with: allPhotosOptions)
+        
+        self.photosCollectionView.reloadData()
     }
 
     private func configurationCollectionView() {
@@ -130,5 +171,16 @@ extension PhotosViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
+    }
+}
+
+extension PhotosViewController {
+    private func alert(title: String, message: String, actions: [AlertModel] = []) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        actions.forEach { action in
+            alert.addAction(UIAlertAction(title: action.title, style: action.style, handler: action.handler))
+        }
+        
+        present(alert, animated: true)
     }
 }

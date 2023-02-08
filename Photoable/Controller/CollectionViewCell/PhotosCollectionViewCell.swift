@@ -13,7 +13,6 @@ class PhotosCollectionViewCell: UICollectionViewCell {
     
     let image: UIImageView = {
         let imageView = UIImageView()
-        imageView.backgroundColor = .gray
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         

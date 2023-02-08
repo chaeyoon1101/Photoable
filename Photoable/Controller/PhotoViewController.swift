@@ -8,15 +8,20 @@
 import UIKit
 import PhotosUI
 
-class PhotosViewController: UIViewController {
+class PhotoViewController: UIViewController {
 
     var photos = PHFetchResult<PHAsset>()
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .systemBackground
         
         setUILayout()
         configurationCollectionView()
         // Do any additional setup after loading the view.
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.isNavigationBarHidden = true
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -91,17 +96,17 @@ class PhotosViewController: UIViewController {
         
         self.photos = PHAsset.fetchAssets(with: allPhotosOptions)
         
-        self.photosCollectionView.reloadData()
+        self.photoCollectionView.reloadData()
     }
 
     private func configurationCollectionView() {
-        photosCollectionView.delegate = self
-        photosCollectionView.dataSource = self
+        photoCollectionView.delegate = self
+        photoCollectionView.dataSource = self
         let cellIdentifier = PhotosCollectionViewCell.identifier
-        photosCollectionView.register(PhotosCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
+        photoCollectionView.register(PhotosCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
     }
     
-    let photosCollectionView: UICollectionView = {
+    let photoCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         
@@ -110,7 +115,7 @@ class PhotosViewController: UIViewController {
     
     
     private func setUILayout() {
-        let views = [photosCollectionView]
+        let views = [photoCollectionView]
         
         views.forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -119,15 +124,15 @@ class PhotosViewController: UIViewController {
         
         print("====== Set UI layout ======")
         NSLayoutConstraint.activate([
-            photosCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            photosCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            photosCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            photosCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            photoCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            photoCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            photoCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            photoCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
 }
 
-extension PhotosViewController: UICollectionViewDataSource {
+extension PhotoViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         print("=========== Photos Count == \(photos.count) =================")
         return photos.count
@@ -154,9 +159,19 @@ extension PhotosViewController: UICollectionViewDataSource {
         
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedPhotoViewController = SelectedPhotoViewController()
+        selectedPhotoViewController.photos = photos
+        selectedPhotoViewController.photoIndex = indexPath.row
+        
+        selectedPhotoViewController.modalPresentationStyle = .fullScreen
+        present(selectedPhotoViewController, animated: true)
+//        navigationController?.pushViewController(selectedPhotoViewController, animated: true)
+    }
 }
 
-extension PhotosViewController: UICollectionViewDelegateFlowLayout {
+extension PhotoViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = collectionView.frame.width / 4 - 1
         let height = width
@@ -174,7 +189,7 @@ extension PhotosViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-extension PhotosViewController {
+extension PhotoViewController {
     private func alert(title: String, message: String, actions: [AlertModel] = []) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         actions.forEach { action in

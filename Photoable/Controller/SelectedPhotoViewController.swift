@@ -15,7 +15,9 @@ class SelectedPhotoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setNavigationBar()
+        setToolbar()
         setUILayout()
+        print(photos.object(at: photoIndex))
         configurationCollectionView()
         self.tabBarController?.tabBar.isHidden = true
         
@@ -42,10 +44,41 @@ class SelectedPhotoViewController: UIViewController {
         photoCreateDateView.setLabel(date: photos[photoIndex].creationDate)
         self.navigationItem.titleView = photoCreateDateView
         self.navigationItem.rightBarButtonItem = rightButton
-//        print(navigationController?.navigationBar.frame.size)
+        
+        let appearence = UINavigationBarAppearance()
+
+        navigationController?.navigationBar.scrollEdgeAppearance = appearence
         navigationController?.isNavigationBarHidden = false
     }
 
+    private func setToolbar() {
+        let shareButton = UIBarButtonItem(image: UIImage(systemName: "arrowshape.turn.up.forward"), style: .plain, target: self, action: #selector(tapShareButton))
+        let favoriteButton = UIBarButtonItem(image: UIImage(systemName: "heart"), style: .plain, target: self, action: #selector(tapFavoriteButton))
+        let deleteButton = UIBarButtonItem(image: UIImage(systemName: "trash"), style: .plain, target: self, action: #selector(tapDeleteButton))
+        let addPhotoToAlbumButton = UIBarButtonItem(image: UIImage(systemName: "rectangle.stack.badge.plus"), style: .plain, target: self, action: #selector(tapAddPhotoToAlbumButton))
+        let fiexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        
+        let items = [shareButton, fiexibleSpace, favoriteButton, fiexibleSpace, addPhotoToAlbumButton, fiexibleSpace, deleteButton]
+        print("===============================")
+        toolbar.setItems(items, animated: true)
+    }
+    
+    @objc private func tapShareButton() {
+        
+    }
+    
+    @objc private func tapFavoriteButton() {
+        
+    }
+                                           
+    @objc private func tapDeleteButton() {
+            
+    }
+    
+    @objc private func tapAddPhotoToAlbumButton() {
+        
+    }
+    
     var navigationTitleLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 2
@@ -64,25 +97,34 @@ class SelectedPhotoViewController: UIViewController {
         collectionView.isPagingEnabled = true
         collectionView.isScrollEnabled = true
         collectionView.contentInsetAdjustmentBehavior = .never
-//        collectionView.backgroundColor = .gray
         
         return collectionView
     }()
     
+    let toolbar: UIToolbar = {
+        let toolbar = UIToolbar()
+        
+        return toolbar
+    }()
+    
     private func setUILayout() {
         self.view.backgroundColor = .systemBackground
-        let views = [photoCollectionView]
+        let views = [photoCollectionView, toolbar]
         
         views.forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
             self.view.addSubview(view)
         }
-        print(view.frame)
+        
         NSLayoutConstraint.activate([
             photoCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
             photoCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             photoCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            photoCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            photoCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            toolbar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            toolbar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
         ])
     }
 }
@@ -113,7 +155,7 @@ extension SelectedPhotoViewController: UICollectionViewDataSource {
             }
         })
         cell.backgroundColor = .blue
-        print(cell.frame)
+        
         return cell
     }
     

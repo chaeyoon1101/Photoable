@@ -11,6 +11,8 @@ import PhotosUI
 class PhotoViewController: UIViewController {
 
     var photos = PHFetchResult<PHAsset>()
+    var albums = PHFetchResult<PHAssetCollection>()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -88,13 +90,13 @@ class PhotoViewController: UIViewController {
     
     private func pickPhoto() {
         let allPhotosOptions = PHFetchOptions()
+        let allAlbumCollection = PHAssetCollection()
         
         allPhotosOptions.sortDescriptors = [
             NSSortDescriptor(key: "creationDate", ascending: false)
         ]
         
         self.photos = PHAsset.fetchAssets(with: allPhotosOptions)
-        
         self.photoCollectionView.reloadData()
     }
 

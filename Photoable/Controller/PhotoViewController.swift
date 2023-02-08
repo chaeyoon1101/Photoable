@@ -14,7 +14,6 @@ class PhotoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        
         setUILayout()
         configurationCollectionView()
         // Do any additional setup after loading the view.
@@ -164,10 +163,8 @@ extension PhotoViewController: UICollectionViewDataSource {
         let selectedPhotoViewController = SelectedPhotoViewController()
         selectedPhotoViewController.photos = photos
         selectedPhotoViewController.photoIndex = indexPath.row
-        
-        selectedPhotoViewController.modalPresentationStyle = .fullScreen
-        present(selectedPhotoViewController, animated: true)
-//        navigationController?.pushViewController(selectedPhotoViewController, animated: true)
+
+        navigationController?.pushViewController(selectedPhotoViewController, animated: true)
     }
 }
 

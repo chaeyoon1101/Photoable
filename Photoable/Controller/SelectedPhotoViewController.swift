@@ -17,6 +17,8 @@ class SelectedPhotoViewController: UIViewController {
         setNavigationBar()
         setUILayout()
         configurationCollectionView()
+        self.tabBarController?.tabBar.isHidden = true
+        
         // Do any additional setup after loading the view.
     }
     
@@ -55,11 +57,14 @@ class SelectedPhotoViewController: UIViewController {
     let photoCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
+        layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 0
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.isPagingEnabled = true
         collectionView.isScrollEnabled = true
-        collectionView.backgroundColor = .gray
+        collectionView.contentInsetAdjustmentBehavior = .never
+//        collectionView.backgroundColor = .gray
         
         return collectionView
     }()
@@ -72,6 +77,7 @@ class SelectedPhotoViewController: UIViewController {
             view.translatesAutoresizingMaskIntoConstraints = false
             self.view.addSubview(view)
         }
+        print(view.frame)
         NSLayoutConstraint.activate([
             photoCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
             photoCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -107,7 +113,7 @@ extension SelectedPhotoViewController: UICollectionViewDataSource {
             }
         })
         cell.backgroundColor = .blue
-        
+        print(cell.frame)
         return cell
     }
     
@@ -122,8 +128,8 @@ extension SelectedPhotoViewController: UICollectionViewDataSource {
 
 extension SelectedPhotoViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.frame.width
-        let height = collectionView.frame.height
+        let width = view.frame.width
+        let height = view.frame.height
         let size = CGSize(width: width, height: height)
         
         return size

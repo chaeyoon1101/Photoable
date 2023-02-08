@@ -17,6 +17,8 @@
 		2B5A5B50298F96C60081CF56 /* SelectedPhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5A5B4F298F96C60081CF56 /* SelectedPhotoViewController.swift */; };
 		2B5A5B53298FBE3E0081CF56 /* Extension+Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5A5B52298FBE3E0081CF56 /* Extension+Date.swift */; };
 		2B5A5B55298FC4E50081CF56 /* PhotoCreateDateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5A5B54298FC4E50081CF56 /* PhotoCreateDateView.swift */; };
+		2BB7F38929938CBE00D5ABC7 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB7F38829938CBE00D5ABC7 /* TabBarViewController.swift */; };
+		2BB7F38B29938D8000D5ABC7 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB7F38A29938D8000D5ABC7 /* AlbumViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,8 @@
 		2B5A5B4F298F96C60081CF56 /* SelectedPhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedPhotoViewController.swift; sourceTree = "<group>"; };
 		2B5A5B52298FBE3E0081CF56 /* Extension+Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+Date.swift"; sourceTree = "<group>"; };
 		2B5A5B54298FC4E50081CF56 /* PhotoCreateDateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCreateDateView.swift; sourceTree = "<group>"; };
+		2BB7F38829938CBE00D5ABC7 /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
+		2BB7F38A29938D8000D5ABC7 /* AlbumViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,9 +83,11 @@
 		2B5A5B42298A36380081CF56 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				2BB7F38729938C9800D5ABC7 /* TabBarController */,
 				2B5A5B48298A43DD0081CF56 /* CollectionViewCell */,
 				2B5016B02952068400547019 /* PhotoViewController.swift */,
 				2B5A5B4F298F96C60081CF56 /* SelectedPhotoViewController.swift */,
+				2BB7F38A29938D8000D5ABC7 /* AlbumViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -117,6 +123,14 @@
 				2B5A5B52298FBE3E0081CF56 /* Extension+Date.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		2BB7F38729938C9800D5ABC7 /* TabBarController */ = {
+			isa = PBXGroup;
+			children = (
+				2BB7F38829938CBE00D5ABC7 /* TabBarViewController.swift */,
+			);
+			path = TabBarController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -193,7 +207,9 @@
 				2B5A5B50298F96C60081CF56 /* SelectedPhotoViewController.swift in Sources */,
 				2B5016B12952068400547019 /* PhotoViewController.swift in Sources */,
 				2B5A5B53298FBE3E0081CF56 /* Extension+Date.swift in Sources */,
+				2BB7F38929938CBE00D5ABC7 /* TabBarViewController.swift in Sources */,
 				2B5A5B4A298A43FA0081CF56 /* PhotosCollectionViewCell.swift in Sources */,
+				2BB7F38B29938D8000D5ABC7 /* AlbumViewController.swift in Sources */,
 				2B5016AD2952068400547019 /* AppDelegate.swift in Sources */,
 				2B5A5B4E298A722C0081CF56 /* AlertModel.swift in Sources */,
 				2B5016AF2952068400547019 /* SceneDelegate.swift in Sources */,

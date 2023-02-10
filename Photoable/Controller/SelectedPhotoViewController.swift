@@ -17,9 +17,9 @@ class SelectedPhotoViewController: UIViewController {
         setNavigationBar()
         setToolbar()
         setUILayout()
-        print(photos.object(at: photoIndex))
         configurationCollectionView()
         self.tabBarController?.tabBar.isHidden = true
+        PHPhotoLibrary.shared().register(self)
         
         // Do any additional setup after loading the view.
     }
@@ -72,7 +72,11 @@ class SelectedPhotoViewController: UIViewController {
     }
                                            
     @objc private func tapDeleteButton() {
-            
+        let asset: PHAsset = self.photos[photoIndex]
+        
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.deleteAssets([asset] as NSArray)
+        }, completionHandler: nil)
     }
     
     @objc private func tapAddPhotoToAlbumButton() {
@@ -129,7 +133,7 @@ class SelectedPhotoViewController: UIViewController {
     }
 }
 
-extension SelectedPhotoViewController: UICollectionViewDataSource {
+extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         print("=========== Photos Count == \(photos.count) =================")
         return photos.count
@@ -159,8 +163,8 @@ extension SelectedPhotoViewController: UICollectionViewDataSource {
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        photoIndex = Int(targetContentOffset.pointee.x / view.frame.width)
     }
 
     
@@ -186,4 +190,16 @@ extension SelectedPhotoViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-
+extension SelectedPhotoViewController: PHPhotoLibraryChangeObserver {
+    func photoLibraryDidChange(_ changeInstance: PHChange) {
+        guard let change = changeInstance.changeDetails(for: photos) else {
+            return
+        }
+        
+        photos = change.fetchResultAfterChanges
+        
+        OperationQueue.main.addOperation {
+            self.photoCollectionView.reloadSections(IndexSet(0...0))
+        }
+    }
+}

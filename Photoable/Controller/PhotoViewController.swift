@@ -11,7 +11,7 @@ import PhotosUI
 class PhotoViewController: UIViewController {
 
     var photos = PHFetchResult<PHAsset>()
-    var albums = PHFetchResult<PHAssetCollection>()
+    var albums = [PHFetchResult<PHAsset>]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,6 +23,7 @@ class PhotoViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.isNavigationBarHidden = true
+        tabBarController?.tabBar.isHidden = false
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -89,14 +90,34 @@ class PhotoViewController: UIViewController {
     }
     
     private func pickPhoto() {
-        let allPhotosOptions = PHFetchOptions()
-        let allAlbumCollection = PHAssetCollection()
+        let photosOptions = PHFetchOptions()
+        photosOptions.includeAssetSourceTypes = [.typeCloudShared, .typeUserLibrary, .typeiTunesSynced]
+//        let smartAlbums = PHAssetCollection.fetchAssetCollections(
+//          with: .smartAlbum,
+//          subtype: .albumRegular,
+//          options: nil)
+
+        let userCollections = PHAssetCollection.fetchAssetCollections(
+            with: .smartAlbum,
+            subtype: .any,
+            options: nil)
+//
+//        userCollections.enumerateObjects { collection, index, stop in
+//            if collection.estimatedAssetCount > 0 {
+////                print(PHAsset.fetchAssets(in: collection, options: nil))
+//            }
+//        }
         
-        allPhotosOptions.sortDescriptors = [
+//        for i in 0..<userCollections.count {
+//            self.albums.append(PHAsset.fetchAssets(in: userCollections[i], options: nil))
+//            print(self.albums[i].count)
+//        }
+        
+        photosOptions.sortDescriptors = [
             NSSortDescriptor(key: "creationDate", ascending: false)
         ]
         
-        self.photos = PHAsset.fetchAssets(with: allPhotosOptions)
+        self.photos = PHAsset.fetchAssets(with: .image, options: photosOptions)
         self.photoCollectionView.reloadData()
     }
 
@@ -150,13 +171,20 @@ extension PhotoViewController: UICollectionViewDataSource {
         let thumbnailSize = CGSize(width: 1024 * UIScreen.main.scale, height: 1024 * UIScreen.main.scale)
         cell.representedAssetIdentifier = asset.localIdentifier
         
-        imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
-            if cell.representedAssetIdentifier == asset.localIdentifier {
-                DispatchQueue.main.async {
-                    cell.image.image = image
-                }
+        if let cachedImage = ImageCache.shared.image(forKey: asset.localIdentifier) {
+            DispatchQueue.main.async {
+                cell.image.image = cachedImage
             }
-        })
+        } else {
+            imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
+                if cell.representedAssetIdentifier == asset.localIdentifier {
+                    DispatchQueue.main.async {
+                        cell.image.image = image
+                        ImageCache.shared.setImage(image, forKey: asset.localIdentifier)
+                    }
+                }
+            })
+        }
         
         return cell
     }

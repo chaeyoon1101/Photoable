@@ -15,27 +15,28 @@ class SelectedPhotoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setNavigationBar()
-        setToolbar()
+        setToolbar(isFavorite: photos[photoIndex].isFavorite)
         setUILayout()
         configurationCollectionView()
-        self.tabBarController?.tabBar.isHidden = true
         PHPhotoLibrary.shared().register(self)
         
         // Do any additional setup after loading the view.
     }
     
-    
     override func viewWillAppear(_ animated: Bool) {
-        DispatchQueue.main.async {
-            self.photoCollectionView.scrollToItem(at: IndexPath(row: self.photoIndex, section: 0), at: .top, animated: true)
-        }
+        tabBarController?.tabBar.isHidden = true
+        
+//        DispatchQueue.main.async {
+//            self.photoCollectionView.scrollToItem(at: IndexPath(row: self.photoIndex, section: 0), at: .top, animated: true)
+//
+//        }
     }
     
     private func configurationCollectionView() {
         photoCollectionView.delegate = self
         photoCollectionView.dataSource = self
-        let cellIdentifier = PhotosCollectionViewCell.identifier
-        photoCollectionView.register(PhotosCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
+        let cellIdentifier = SelectedPhotosCollectionViewCell.identifier
+        photoCollectionView.register(SelectedPhotosCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
     }
     
     private func setNavigationBar() {
@@ -51,15 +52,15 @@ class SelectedPhotoViewController: UIViewController {
         navigationController?.isNavigationBarHidden = false
     }
 
-    private func setToolbar() {
+    private func setToolbar(isFavorite: Bool) {
         let shareButton = UIBarButtonItem(image: UIImage(systemName: "arrowshape.turn.up.forward"), style: .plain, target: self, action: #selector(tapShareButton))
-        let favoriteButton = UIBarButtonItem(image: UIImage(systemName: "heart"), style: .plain, target: self, action: #selector(tapFavoriteButton))
+        let favoriteButton = UIBarButtonItem(image: UIImage(systemName: isFavorite ? "heart.fill" : "heart"), style: .plain, target: self, action: #selector(tapFavoriteButton))
         let deleteButton = UIBarButtonItem(image: UIImage(systemName: "trash"), style: .plain, target: self, action: #selector(tapDeleteButton))
         let addPhotoToAlbumButton = UIBarButtonItem(image: UIImage(systemName: "rectangle.stack.badge.plus"), style: .plain, target: self, action: #selector(tapAddPhotoToAlbumButton))
         let fiexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         
         let items = [shareButton, fiexibleSpace, favoriteButton, fiexibleSpace, addPhotoToAlbumButton, fiexibleSpace, deleteButton]
-        print("===============================")
+        
         toolbar.setItems(items, animated: true)
     }
     
@@ -68,7 +69,24 @@ class SelectedPhotoViewController: UIViewController {
     }
     
     @objc private func tapFavoriteButton() {
-        
+        let isFavoritePhoto = self.photos[photoIndex].isFavorite
+        PHPhotoLibrary.shared().performChanges({ [self] in
+            let asset = self.photos[photoIndex]
+            let changeRequest = PHAssetChangeRequest(for: asset)
+            
+            if isFavoritePhoto {
+                changeRequest.isFavorite = false
+            } else {
+                changeRequest.isFavorite = true
+            }
+        }, completionHandler: { (_, error) in
+            DispatchQueue.main.async {
+                self.setToolbar(isFavorite: !isFavoritePhoto)
+            }
+            if let error = error {
+                print("Error changing favorite: \(error.localizedDescription)")
+            }
+        })
     }
                                            
     @objc private func tapDeleteButton() {
@@ -76,7 +94,11 @@ class SelectedPhotoViewController: UIViewController {
         
         PHPhotoLibrary.shared().performChanges({
             PHAssetChangeRequest.deleteAssets([asset] as NSArray)
-        }, completionHandler: nil)
+        }, completionHandler: { (_, error) in
+            if let error = error {
+                print("Error deleting photo: \(error.localizedDescription)")
+            }
+        })
     }
     
     @objc private func tapAddPhotoToAlbumButton() {
@@ -140,36 +162,44 @@ extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionV
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cellIdentifier = PhotosCollectionViewCell.identifier
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? PhotosCollectionViewCell else {
+        let cellIdentifier = SelectedPhotosCollectionViewCell.identifier
+        let asset = self.photos[indexPath.item]
+        
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? SelectedPhotosCollectionViewCell else {
             return UICollectionViewCell()
         }
         
         let imageManager = PHCachingImageManager()
-        let asset = self.photos[indexPath.item]
         let thumbnailSize = CGSize(width: 1024 * UIScreen.main.scale, height: 1024 * UIScreen.main.scale)
+        let cachedImage = ImageCache.shared.image(forKey: asset.localIdentifier)
+        
         cell.representedAssetIdentifier = asset.localIdentifier
+        cell.image.contentMode = .scaleAspectFit
         
-        imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFit, options: nil, resultHandler: { image, _ in
-            if cell.representedAssetIdentifier == asset.localIdentifier {
-                DispatchQueue.main.async {
-                    cell.image.contentMode = .scaleAspectFit
-                    cell.image.image = image
-                }
+        if let image = cachedImage, image.size.width + image.size.height > 2000 {
+            DispatchQueue.main.async {
+                cell.image.image = image
             }
-        })
-        cell.backgroundColor = .blue
-        
+        } else {
+            imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFit, options: nil, resultHandler: { image, _ in
+                if cell.representedAssetIdentifier == asset.localIdentifier {
+                    DispatchQueue.main.async {
+                        cell.image.image = image
+                        ImageCache.shared.setImage(image, forKey: asset.localIdentifier)
+                    }
+                }
+            })
+        }
         return cell
     }
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         photoIndex = Int(targetContentOffset.pointee.x / view.frame.width)
+        print(self.photos[photoIndex].mediaType == .video)
+        setToolbar(isFavorite: photos[photoIndex].isFavorite)
+        self.setNavigationBar()
+        
     }
-
-    
-    
-//    func collectionView
 }
 
 extension SelectedPhotoViewController: UICollectionViewDelegateFlowLayout {

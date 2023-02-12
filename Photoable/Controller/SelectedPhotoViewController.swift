@@ -18,6 +18,7 @@ class SelectedPhotoViewController: UIViewController {
         setToolbar(isFavorite: photos[photoIndex].isFavorite)
         setUILayout()
         configurationCollectionView()
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         PHPhotoLibrary.shared().register(self)
         
         // Do any additional setup after loading the view.
@@ -25,11 +26,9 @@ class SelectedPhotoViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         tabBarController?.tabBar.isHidden = true
-        
-//        DispatchQueue.main.async {
-//            self.photoCollectionView.scrollToItem(at: IndexPath(row: self.photoIndex, section: 0), at: .top, animated: true)
-//
-//        }
+        DispatchQueue.main.async { [self] in
+            self.photoCollectionView.scrollToItem(at: IndexPath(item: photoIndex, section: 0), at: .left, animated: false)
+        }
     }
     
     private func configurationCollectionView() {
@@ -103,6 +102,11 @@ class SelectedPhotoViewController: UIViewController {
     
     @objc private func tapAddPhotoToAlbumButton() {
         
+    }
+    
+    @objc private func dismissViewController() {
+        print(1)
+        navigationController?.popViewController(animated: true)
     }
     
     var navigationTitleLabel: UILabel = {
@@ -190,6 +194,11 @@ extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionV
                 }
             })
         }
+        
+        let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(dismissViewController))
+        swipeDown.direction = UISwipeGestureRecognizer.Direction.down
+        cell.addGestureRecognizer(swipeDown)
+        
         return cell
     }
     
@@ -199,6 +208,15 @@ extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionV
         setToolbar(isFavorite: photos[photoIndex].isFavorite)
         self.setNavigationBar()
         
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let sourceIndexPath = IndexPath(item: 0, section: 0)
+        let destinationIndexPath = IndexPath(item: photoIndex, section: 0)
+        
+        collectionView.performBatchUpdates {
+            collectionView.moveItem(at: sourceIndexPath, to: destinationIndexPath )
+        }
     }
 }
 

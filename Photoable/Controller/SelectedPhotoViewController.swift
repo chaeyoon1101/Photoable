@@ -20,6 +20,7 @@ class SelectedPhotoViewController: UIViewController {
         configurationCollectionView()
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         PHPhotoLibrary.shared().register(self)
+        NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
         
         // Do any additional setup after loading the view.
     }
@@ -29,6 +30,7 @@ class SelectedPhotoViewController: UIViewController {
         DispatchQueue.main.async { [self] in
             self.photoCollectionView.scrollToItem(at: IndexPath(item: photoIndex, section: 0), at: .left, animated: false)
         }
+        photoCollectionView.reloadData()
     }
     
     private func configurationCollectionView() {
@@ -105,8 +107,14 @@ class SelectedPhotoViewController: UIViewController {
     }
     
     @objc private func dismissViewController() {
-        print(1)
         navigationController?.popViewController(animated: true)
+    }
+    
+    @objc private func handlePhotoLibraryDidChange(notification: Notification) {
+        if let asset = notification.object as? PHFetchResult<PHAsset> {
+            self.photos = asset
+        }
+        photoCollectionView.reloadData()
     }
     
     var navigationTitleLabel: UILabel = {
@@ -204,7 +212,6 @@ extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionV
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         photoIndex = Int(targetContentOffset.pointee.x / view.frame.width)
-        print(self.photos[photoIndex].mediaType == .video)
         setToolbar(isFavorite: photos[photoIndex].isFavorite)
         self.setNavigationBar()
         
@@ -244,10 +251,8 @@ extension SelectedPhotoViewController: PHPhotoLibraryChangeObserver {
             return
         }
         
-        photos = change.fetchResultAfterChanges
-        
-        OperationQueue.main.addOperation {
-            self.photoCollectionView.reloadSections(IndexSet(0...0))
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: NSNotification.Name("photoLibraryDidChange"), object: change.fetchResultAfterChanges)
         }
     }
 }

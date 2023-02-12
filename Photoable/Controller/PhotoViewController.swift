@@ -97,16 +97,9 @@ class PhotoViewController: UIViewController {
 //          subtype: .albumRegular,
 //          options: nil)
 
-        let userCollections = PHAssetCollection.fetchAssetCollections(
-            with: .smartAlbum,
-            subtype: .any,
-            options: nil)
+        
 //
-//        userCollections.enumerateObjects { collection, index, stop in
-//            if collection.estimatedAssetCount > 0 {
-////                print(PHAsset.fetchAssets(in: collection, options: nil))
-//            }
-//        }
+        
         
 //        for i in 0..<userCollections.count {
 //            self.albums.append(PHAsset.fetchAssets(in: userCollections[i], options: nil))

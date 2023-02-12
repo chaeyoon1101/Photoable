@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		2B4316612998F8D900199381 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4316602998F8D900199381 /* ImageCache.swift */; };
 		2B4316672999189400199381 /* SelectedPhotosCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4316662999189400199381 /* SelectedPhotosCollectionViewCell.swift */; };
+		2B43166929994EE000199381 /* AlbumCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B43166829994EE000199381 /* AlbumCollectionViewCell.swift */; };
+		2B43166E2999570500199381 /* AlbumModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B43166D2999570500199381 /* AlbumModel.swift */; };
 		2B5016AD2952068400547019 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016AC2952068400547019 /* AppDelegate.swift */; };
 		2B5016AF2952068400547019 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016AE2952068400547019 /* SceneDelegate.swift */; };
 		2B5016B12952068400547019 /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016B02952068400547019 /* PhotoViewController.swift */; };
@@ -26,6 +28,8 @@
 /* Begin PBXFileReference section */
 		2B4316602998F8D900199381 /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		2B4316662999189400199381 /* SelectedPhotosCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedPhotosCollectionViewCell.swift; sourceTree = "<group>"; };
+		2B43166829994EE000199381 /* AlbumCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumCollectionViewCell.swift; sourceTree = "<group>"; };
+		2B43166D2999570500199381 /* AlbumModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumModel.swift; sourceTree = "<group>"; };
 		2B5016A92952068400547019 /* Photoable.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photoable.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B5016AC2952068400547019 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B5016AE2952068400547019 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -118,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				2B5A5B4D298A722C0081CF56 /* AlertModel.swift */,
+				2B43166D2999570500199381 /* AlbumModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -127,6 +132,7 @@
 			children = (
 				2B5A5B49298A43FA0081CF56 /* PhotosCollectionViewCell.swift */,
 				2B4316662999189400199381 /* SelectedPhotosCollectionViewCell.swift */,
+				2B43166829994EE000199381 /* AlbumCollectionViewCell.swift */,
 			);
 			path = CollectionViewCell;
 			sourceTree = "<group>";
@@ -218,11 +224,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B4316612998F8D900199381 /* ImageCache.swift in Sources */,
+				2B43166929994EE000199381 /* AlbumCollectionViewCell.swift in Sources */,
 				2B5A5B55298FC4E50081CF56 /* PhotoCreateDateView.swift in Sources */,
 				2B5A5B50298F96C60081CF56 /* SelectedPhotoViewController.swift in Sources */,
 				2B5016B12952068400547019 /* PhotoViewController.swift in Sources */,
 				2B5A5B53298FBE3E0081CF56 /* Extension+Date.swift in Sources */,
 				2BB7F38929938CBE00D5ABC7 /* TabBarViewController.swift in Sources */,
+				2B43166E2999570500199381 /* AlbumModel.swift in Sources */,
 				2B5A5B4A298A43FA0081CF56 /* PhotosCollectionViewCell.swift in Sources */,
 				2BB7F38B29938D8000D5ABC7 /* AlbumViewController.swift in Sources */,
 				2B5016AD2952068400547019 /* AppDelegate.swift in Sources */,

@@ -15,12 +15,17 @@ class AlbumViewController: UIViewController {
     }
     
     private func pickPhoto() {
-        let userCollections = PHAssetCollection.fetchAssetCollections(
+        let smartCollections = PHAssetCollection.fetchAssetCollections(
             with: .smartAlbum,
             subtype: .any,
             options: nil)
         
-        userCollections.enumerateObjects { collection, index, stop in
+        let userColletions = PHAssetCollection.fetchAssetCollections(
+            with: .album,
+            subtype: .any,
+            options: nil)
+        
+        smartCollections.enumerateObjects { collection, index, stop in
             if collection.estimatedAssetCount > 0 {
                 let fetchOptions = PHFetchOptions()
                 fetchOptions.sortDescriptors = [
@@ -41,7 +46,19 @@ class AlbumViewController: UIViewController {
                         break
                     }
                 }
+            }
+        }
+        
+        userColletions.enumerateObjects { collection, index, stop in
+            if collection.estimatedAssetCount > 0 {
+                let fetchOptions = PHFetchOptions()
+                fetchOptions.sortDescriptors = [
+                    NSSortDescriptor(key: "creationDate", ascending: false)
+                ]
+                fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
                 
+                let assets = PHAsset.fetchAssets(in: collection, options: fetchOptions)
+                self.albums.append(AlbumModel(asset: assets, title: collection.localizedTitle ?? "이름 없음", count: assets.count))
             }
         }
     }
@@ -128,4 +145,11 @@ extension AlbumViewController: UICollectionViewDelegateFlowLayout {
         return size
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 30
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 30
+    }
 }

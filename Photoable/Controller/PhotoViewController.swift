@@ -10,110 +10,34 @@ import PhotosUI
 
 class PhotoViewController: UIViewController {
 
-    var photos = PHFetchResult<PHAsset>()
-    var albums = [PHFetchResult<PHAsset>]()
-    
+    var assets = PHFetchResult<PHAsset>()
+    var albumTitle: String?
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
         setUILayout()
         configurationCollectionView()
+        NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
         // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        navigationController?.isNavigationBarHidden = true
-        tabBarController?.tabBar.isHidden = false
+        navigationItem.largeTitleDisplayMode = .never
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        navigationItem.title = albumTitle
+        photoCollectionView.reloadData()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        getPermissionIfNecessary()
-    }
-    
-    private func getPermissionIfNecessary() {
-        switch PHPhotoLibrary.authorizationStatus(for: .readWrite) {
-        case .authorized, .limited:
-            pickPhoto()
-            
-        case .denied:
-            print("======== denied ===========")
-            let actions = [
-                AlertModel(title: "설정 변경하러 가기", style: .default, handler: { _ in
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
-                    }
-                }),
-                AlertModel(title: "확인", style: .default, handler: { _ in print("확인") })
-            ]
-            DispatchQueue.main.async {
-                self.alert(title: "사진 접근 권한", message: "사진 접근 권한이 거부 되었어요", actions: actions)
-            }
-            
-        case .restricted, .notDetermined:
-            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-                switch status {
-                case .authorized, .limited:
-                    self.pickPhoto()
-                case .notDetermined, .restricted:
-                    let actions = [
-                        AlertModel(title: "설정 변경하러 가기", style: .default, handler: { _ in
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                UIApplication.shared.open(url)
-                            }
-                        }),
-                        AlertModel(title: "확인", style: .default, handler: { _ in print("확인") })
-                    ]
-                    DispatchQueue.main.async {
-                        self.alert(title: "사진 접근 권한", message: "사진 접근 권한이 허용 되지 않았어요", actions: actions)
-                    }
-                   
-                case .denied:
-                    let actions = [
-                        AlertModel(title: "설정 변경하러 가기", style: .default, handler: { _ in
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                UIApplication.shared.open(url)
-                            }
-                        }),
-                        AlertModel(title: "확인", style: .default, handler: { _ in print("확인") })
-                    ]
-                    DispatchQueue.main.async {
-                        self.alert(title: "사진 접근 권한", message: "사진 접근 권한이 거부 되었어요", actions: actions)
-                    }
-                
-                @unknown default:
-                    break
-                }
-            }
-        @unknown default:
-            break
+    @objc private func handlePhotoLibraryDidChange(notification: Notification) {
+        if let asset = notification.object as? PHFetchResult<PHAsset> {
+            self.assets = asset
         }
-    }
-    
-    private func pickPhoto() {
-        let photosOptions = PHFetchOptions()
-        photosOptions.includeAssetSourceTypes = [.typeCloudShared, .typeUserLibrary, .typeiTunesSynced]
-//        let smartAlbums = PHAssetCollection.fetchAssetCollections(
-//          with: .smartAlbum,
-//          subtype: .albumRegular,
-//          options: nil)
-
-        
-//
-        
-        
-//        for i in 0..<userCollections.count {
-//            self.albums.append(PHAsset.fetchAssets(in: userCollections[i], options: nil))
-//            print(self.albums[i].count)
+        print("photoViewController 변경")
+//        DispatchQueue.main.sync {
+            self.photoCollectionView.reloadData()
 //        }
         
-        photosOptions.sortDescriptors = [
-            NSSortDescriptor(key: "creationDate", ascending: false)
-        ]
-        
-        self.photos = PHAsset.fetchAssets(with: .image, options: photosOptions)
-        self.photoCollectionView.reloadData()
     }
-
+    
     private func configurationCollectionView() {
         photoCollectionView.delegate = self
         photoCollectionView.dataSource = self
@@ -149,8 +73,7 @@ class PhotoViewController: UIViewController {
 
 extension PhotoViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print("=========== Photos Count == \(photos.count) =================")
-        return photos.count
+        return assets.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -159,24 +82,19 @@ extension PhotoViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
 
-        let imageManager = PHCachingImageManager()
-        let asset = self.photos[indexPath.item]
-        let thumbnailSize = CGSize(width: 1024 * UIScreen.main.scale, height: 1024 * UIScreen.main.scale)
-        cell.representedAssetIdentifier = asset.localIdentifier
+        let asset = self.assets[indexPath.item]
+        let imageManager = ImageManager()
         
         if let cachedImage = ImageCache.shared.image(forKey: asset.localIdentifier) {
             DispatchQueue.main.async {
                 cell.image.image = cachedImage
             }
         } else {
-            imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
-                if cell.representedAssetIdentifier == asset.localIdentifier {
-                    DispatchQueue.main.async {
-                        cell.image.image = image
-                        ImageCache.shared.setImage(image, forKey: asset.localIdentifier)
-                    }
-                }
-            })
+            DispatchQueue.main.async {
+                imageManager.fetchImage(asset: asset, cellIdentifier: asset.localIdentifier, completion: { image in
+                    cell.image.image = image
+                })
+            }
         }
         
         return cell
@@ -184,7 +102,7 @@ extension PhotoViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedPhotoViewController = SelectedPhotoViewController()
-        selectedPhotoViewController.photos = photos
+        selectedPhotoViewController.photos = assets
         selectedPhotoViewController.photoIndex = indexPath.row
 
         navigationController?.pushViewController(selectedPhotoViewController, animated: true)
@@ -209,13 +127,16 @@ extension PhotoViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-extension PhotoViewController {
-    private func alert(title: String, message: String, actions: [AlertModel] = []) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        actions.forEach { action in
-            alert.addAction(UIAlertAction(title: action.title, style: action.style, handler: action.handler))
+extension PhotoViewController: PHPhotoLibraryChangeObserver {
+    func photoLibraryDidChange(_ changeInstance: PHChange) {
+        guard let change = changeInstance.changeDetails(for: assets) else {
+            return
         }
         
-        present(alert, animated: true)
+        assets = change.fetchResultAfterChanges
+        
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: NSNotification.Name("photoLibraryDidChange"), object: change.fetchResultAfterChanges)
+        }
     }
 }

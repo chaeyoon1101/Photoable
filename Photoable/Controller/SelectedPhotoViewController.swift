@@ -18,8 +18,8 @@ class SelectedPhotoViewController: UIViewController {
         setToolbar(isFavorite: photos[photoIndex].isFavorite)
         setUILayout()
         configurationCollectionView()
-        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         PHPhotoLibrary.shared().register(self)
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
         
         // Do any additional setup after loading the view.
@@ -103,7 +103,10 @@ class SelectedPhotoViewController: UIViewController {
     }
     
     @objc private func tapAddPhotoToAlbumButton() {
+        let addPhotoToAlbumViewController = AddPhotoToAlbumViewController()
         
+        addPhotoToAlbumViewController.assets = [photos[photoIndex]]
+        self.present(addPhotoToAlbumViewController, animated: true)
     }
     
     @objc private func dismissViewController() {
@@ -114,7 +117,31 @@ class SelectedPhotoViewController: UIViewController {
         if let asset = notification.object as? PHFetchResult<PHAsset> {
             self.photos = asset
         }
-        photoCollectionView.reloadData()
+        
+        print("SelectedViewController 변경")
+
+        self.photoCollectionView.reloadData()
+    }
+    
+    private func setUILayout() {
+        self.view.backgroundColor = .systemBackground
+        let views = [photoCollectionView, toolbar]
+        
+        views.forEach { view in
+            view.translatesAutoresizingMaskIntoConstraints = false
+            self.view.addSubview(view)
+        }
+        
+        NSLayoutConstraint.activate([
+            photoCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            photoCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            photoCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            photoCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            toolbar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            toolbar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+        ])
     }
     
     var navigationTitleLabel: UILabel = {
@@ -144,32 +171,10 @@ class SelectedPhotoViewController: UIViewController {
         
         return toolbar
     }()
-    
-    private func setUILayout() {
-        self.view.backgroundColor = .systemBackground
-        let views = [photoCollectionView, toolbar]
-        
-        views.forEach { view in
-            view.translatesAutoresizingMaskIntoConstraints = false
-            self.view.addSubview(view)
-        }
-        
-        NSLayoutConstraint.activate([
-            photoCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
-            photoCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            photoCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            photoCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
-            toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            toolbar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            toolbar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
-        ])
-    }
 }
 
 extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print("=========== Photos Count == \(photos.count) =================")
         return photos.count
     }
     
@@ -181,26 +186,20 @@ extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionV
             return UICollectionViewCell()
         }
         
-        let imageManager = PHCachingImageManager()
-        let thumbnailSize = CGSize(width: 1024 * UIScreen.main.scale, height: 1024 * UIScreen.main.scale)
-        let cachedImage = ImageCache.shared.image(forKey: asset.localIdentifier)
-        
-        cell.representedAssetIdentifier = asset.localIdentifier
         cell.image.contentMode = .scaleAspectFit
         
-        if let image = cachedImage, image.size.width + image.size.height > 2000 {
+        let imageManager = ImageManager()
+        
+        if let cachedImage = ImageCache.shared.image(forKey: asset.localIdentifier) {
             DispatchQueue.main.async {
-                cell.image.image = image
+                cell.image.image = cachedImage
             }
         } else {
-            imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFit, options: nil, resultHandler: { image, _ in
-                if cell.representedAssetIdentifier == asset.localIdentifier {
-                    DispatchQueue.main.async {
-                        cell.image.image = image
-                        ImageCache.shared.setImage(image, forKey: asset.localIdentifier)
-                    }
-                }
-            })
+            DispatchQueue.main.async {
+                imageManager.fetchImage(asset: asset, cellIdentifier: asset.localIdentifier, completion: { image in
+                    cell.image.image = image
+                })
+            }
         }
         
         let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(dismissViewController))

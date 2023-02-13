@@ -16,14 +16,23 @@ class PhotoViewController: UIViewController {
     var photoSelectStatus: PhotoSelectStatus = .defaultStatus
     var isSelectedPhotos: [Bool] = []
     let imageManager = PHCachingImageManager()
+    var selectedPhotoIdentifiers = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setUILayout()
         configurationCollectionView()
+        setToolbar()
         isSelectedPhotos = [Bool](repeating: false, count: assets.count)
         navigationItem.rightBarButtonItem = selectPhotoButtonItem
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
+        moreButtonMenu = UIMenu(children: [
+            UIAction(title: "삭제하기", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+                self.deletePhotos()
+            },
+            UIAction(title: "앨범에 추가하기", image: UIImage(systemName: "rectangle.stack.badge.plus")) { _ in print(1)
+            }
+        ])
         // Do any additional setup after loading the view.
     }
     
@@ -38,12 +47,14 @@ class PhotoViewController: UIViewController {
     @objc private func tapSelectPhotosButton() {
         photoSelectStatus = .seletingPhotoStatus
         navigationItem.rightBarButtonItem = cancleSelectPhotoButtonItem
-        
+        toolbar.isHidden = false
     }
     
     @objc private func tapCancleSelectPhotoButton() {
         photoSelectStatus = .defaultStatus
         navigationItem.rightBarButtonItem = selectPhotoButtonItem
+        toolbar.isHidden = true
+        deselectAllPhoto()
     }
     
     @objc private func handlePhotoLibraryDidChange(notification: Notification) {
@@ -54,6 +65,58 @@ class PhotoViewController: UIViewController {
         self.photoCollectionView.reloadData()
     }
     
+    @objc private func tapMoreButton() {
+        
+    }
+    
+    private func deletePhotos() {
+        var actions = [AlertModel]()
+        let imageManager = ImageManager()
+        let albumManager = AlbumManager()
+        
+        print(selectedPhotoIdentifiers)
+        if albumType == "userAlbum" {
+            actions.append(AlertModel(title: "앨범에서 제거", style: .default, handler: { [self] _ in
+                albumManager.removeImages(assetIdentifiers: selectedPhotoIdentifiers, toAlbum: albumName ?? "이름 없음") { result in
+                    switch result {
+                    case .success((let albumName, let deletedImageCount)):
+                        print("사진 \(deletedImageCount)장 \(albumName) 앨범에서 삭제 완료")
+                    case .failure(let error):
+                        print(error)
+                    }
+                }
+            }))
+        }
+
+        actions.append(AlertModel(title: "영구적으로 삭제", style: .destructive, handler: { [self] _ in
+            imageManager.deleteImages(assetIdentifiers: selectedPhotoIdentifiers) { result in
+                switch result {
+                case .success(let deletedImageCount):
+                    print("사진 \(deletedImageCount)장 삭제 완료")
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        }))
+
+        actions.append(AlertModel(title: "취소", style: .cancel, handler: { _ in
+            print("취소")
+        }))
+
+        alert(title: "이 사진을 영구적으로 삭제하시겠습니까? \(albumType == "userAlbum" ? "아니면 이 앨범에서 제거하시겠습니까?" : "")", message: "", actions: actions)
+    }
+    
+    private func deselectAllPhoto() {
+        for index in 0..<assets.count {
+            if let cell = photoCollectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? PhotosCollectionViewCell {
+                cell.isSelectedPhoto = false
+            }
+        }
+        selectedPhotoIdentifiers = []
+        isSelectedPhotos = [Bool](repeating: false, count: assets.count)
+        setToolbar()
+    }
+    
     private func configurationCollectionView() {
         photoCollectionView.delegate = self
         photoCollectionView.dataSource = self
@@ -61,9 +124,41 @@ class PhotoViewController: UIViewController {
         photoCollectionView.register(PhotosCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
     }
     
+    private func setToolbar() {
+        let moreButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: moreButtonMenu)
+        
+        if selectedPhotoIdentifiers.count == 0 {
+            toolBarTitleLabel.text = "사진 선택"
+            moreButton.isEnabled = false
+        } else {
+            toolBarTitleLabel.text = "\(selectedPhotoIdentifiers.count)장의 사진이 선택됨"
+            moreButton.isEnabled = true
+        }
+        
+        let titleView = UIBarButtonItem(customView: toolBarTitleLabel)
+        let fiexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        let items = [fiexibleSpace, titleView, fiexibleSpace, moreButton]
+        
+        toolbar.setItems(items, animated: true)
+    }
+    
     private lazy var selectPhotoButtonItem = UIBarButtonItem(title: "사진 선택", style: .done, target: self, action: #selector(tapSelectPhotosButton))
     
     private lazy var cancleSelectPhotoButtonItem = UIBarButtonItem(title: "취소", style: .done, target: self, action: #selector(tapCancleSelectPhotoButton))
+    
+    var moreButtonMenu: UIMenu = {
+        let menu = UIMenu()
+        
+        return menu
+    }()
+    
+    let toolBarTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "1장의 사진이 선택 됨"
+        label.textAlignment = .center
+        
+        return label
+    }()
     
     let photoCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -72,9 +167,15 @@ class PhotoViewController: UIViewController {
         return collectionView
     }()
     
+    let toolbar: UIToolbar = {
+        let toolbar = UIToolbar()
+        toolbar.isHidden = true
+        
+        return toolbar
+    }()
     
     private func setUILayout() {
-        let views = [photoCollectionView]
+        let views = [photoCollectionView, toolbar]
         
         views.forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -87,6 +188,9 @@ class PhotoViewController: UIViewController {
             photoCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             photoCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             photoCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            toolbar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            toolbar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
         ])
     }
 }
@@ -112,7 +216,7 @@ extension PhotoViewController: UICollectionViewDataSource {
             }
         } else {
             let thumbnailSize = CGSize(width: 1024 * UIScreen.main.scale, height: 1024 * UIScreen.main.scale)
-
+            
             imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
                 if cell.representedAssetIdentifier == asset.localIdentifier {
                     DispatchQueue.main.async {
@@ -137,6 +241,7 @@ extension PhotoViewController: UICollectionViewDataSource {
             guard let cell = collectionView.cellForItem(at: indexPath) as? PhotosCollectionViewCell else {
                 return
             }
+            selectedPhotoIdentifiers = []
             
             if cell.isSelectedPhoto == true {
                 cell.isSelectedPhoto = false
@@ -145,6 +250,13 @@ extension PhotoViewController: UICollectionViewDataSource {
                 cell.isSelectedPhoto = true
                 isSelectedPhotos[indexPath.item] = true
             }
+            
+            for index in 0..<isSelectedPhotos.count {
+                if isSelectedPhotos[index] == true {
+                    selectedPhotoIdentifiers.append(assets[index].localIdentifier)
+                }
+            }
+            setToolbar()
             
         } else {
             let selectedPhotoViewController = SelectedPhotoViewController()
@@ -186,5 +298,16 @@ extension PhotoViewController: PHPhotoLibraryChangeObserver {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: NSNotification.Name("photoLibraryDidChange"), object: change.fetchResultAfterChanges)
         }
+    }
+}
+
+extension PhotoViewController {
+    private func alert(title: String, message: String, actions: [AlertModel] = []) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+        actions.forEach { action in
+            alert.addAction(UIAlertAction(title: action.title, style: action.style, handler: action.handler))
+        }
+        
+        present(alert, animated: true)
     }
 }

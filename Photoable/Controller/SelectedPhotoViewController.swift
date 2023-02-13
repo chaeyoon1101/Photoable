@@ -13,6 +13,7 @@ class SelectedPhotoViewController: UIViewController {
     var photoIndex = 0
     var albumType: String?
     var albumName: String?
+    let imageManager = PHCachingImageManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -215,18 +216,23 @@ extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionV
         
         cell.image.contentMode = .scaleAspectFit
         
-        let imageManager = ImageManager()
+        cell.representedAssetIdentifier = asset.localIdentifier
         
         if let cachedImage = ImageCache.shared.image(forKey: asset.localIdentifier) {
             DispatchQueue.main.async {
                 cell.image.image = cachedImage
             }
         } else {
-            DispatchQueue.main.async {
-                imageManager.fetchImage(asset: asset, cellIdentifier: asset.localIdentifier, completion: { image in
-                    cell.image.image = image
-                })
-            }
+            let thumbnailSize = CGSize(width: 1024 * UIScreen.main.scale, height: 1024 * UIScreen.main.scale)
+
+            imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
+                if cell.representedAssetIdentifier == asset.localIdentifier {
+                    DispatchQueue.main.async {
+                        cell.image.image = image
+                    }
+                    ImageCache.shared.setImage(image, forKey: asset.localIdentifier)
+                }
+            })
         }
         
         let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(dismissViewController))

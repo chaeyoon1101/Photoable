@@ -9,15 +9,20 @@ import UIKit
 import PhotosUI
 
 class PhotoViewController: UIViewController {
-
+    
     var assets = PHFetchResult<PHAsset>()
     var albumName: String?
     var albumType: String?
+    var photoSelectStatus: PhotoSelectStatus = .defaultStatus
+    var isSelectedPhotos: [Bool] = []
+    let imageManager = PHCachingImageManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setUILayout()
         configurationCollectionView()
+        isSelectedPhotos = [Bool](repeating: false, count: assets.count)
+        navigationItem.rightBarButtonItem = selectPhotoButtonItem
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
         // Do any additional setup after loading the view.
     }
@@ -25,8 +30,20 @@ class PhotoViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         navigationItem.largeTitleDisplayMode = .never
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        
         navigationItem.title = albumName
         photoCollectionView.reloadData()
+    }
+    
+    @objc private func tapSelectPhotosButton() {
+        photoSelectStatus = .seletingPhotoStatus
+        navigationItem.rightBarButtonItem = cancleSelectPhotoButtonItem
+        
+    }
+    
+    @objc private func tapCancleSelectPhotoButton() {
+        photoSelectStatus = .defaultStatus
+        navigationItem.rightBarButtonItem = selectPhotoButtonItem
     }
     
     @objc private func handlePhotoLibraryDidChange(notification: Notification) {
@@ -34,10 +51,7 @@ class PhotoViewController: UIViewController {
             self.assets = asset
         }
         print("photoViewController 변경")
-//        DispatchQueue.main.sync {
-            self.photoCollectionView.reloadData()
-//        }
-        
+        self.photoCollectionView.reloadData()
     }
     
     private func configurationCollectionView() {
@@ -46,6 +60,10 @@ class PhotoViewController: UIViewController {
         let cellIdentifier = PhotosCollectionViewCell.identifier
         photoCollectionView.register(PhotosCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
     }
+    
+    private lazy var selectPhotoButtonItem = UIBarButtonItem(title: "사진 선택", style: .done, target: self, action: #selector(tapSelectPhotosButton))
+    
+    private lazy var cancleSelectPhotoButtonItem = UIBarButtonItem(title: "취소", style: .done, target: self, action: #selector(tapCancleSelectPhotoButton))
     
     let photoCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -83,32 +101,59 @@ extension PhotoViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? PhotosCollectionViewCell else {
             return UICollectionViewCell()
         }
-
+        
+        
         let asset = self.assets[indexPath.item]
-        let imageManager = ImageManager()
+        cell.representedAssetIdentifier = asset.localIdentifier
         
         if let cachedImage = ImageCache.shared.image(forKey: asset.localIdentifier) {
             DispatchQueue.main.async {
                 cell.image.image = cachedImage
             }
         } else {
-            DispatchQueue.main.async {
-                imageManager.fetchImage(asset: asset, cellIdentifier: asset.localIdentifier, completion: { image in
-                    cell.image.image = image
-                })
-            }
+            let thumbnailSize = CGSize(width: 1024 * UIScreen.main.scale, height: 1024 * UIScreen.main.scale)
+
+            imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
+                if cell.representedAssetIdentifier == asset.localIdentifier {
+                    DispatchQueue.main.async {
+                        cell.image.image = image
+                    }
+                    ImageCache.shared.setImage(image, forKey: asset.localIdentifier)
+                }
+            })
+        }
+        
+        if isSelectedPhotos[indexPath.item] == true {
+            cell.isSelectedPhoto = true
+        } else {
+            cell.isSelectedPhoto = false
         }
         
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedPhotoViewController = SelectedPhotoViewController()
-        selectedPhotoViewController.assets = assets
-        selectedPhotoViewController.photoIndex = indexPath.row
-        selectedPhotoViewController.albumType = albumType
-        selectedPhotoViewController.albumName = albumName
-        navigationController?.pushViewController(selectedPhotoViewController, animated: true)
+        if photoSelectStatus == .seletingPhotoStatus {
+            guard let cell = collectionView.cellForItem(at: indexPath) as? PhotosCollectionViewCell else {
+                return
+            }
+            
+            if cell.isSelectedPhoto == true {
+                cell.isSelectedPhoto = false
+                isSelectedPhotos[indexPath.item] = false
+            } else {
+                cell.isSelectedPhoto = true
+                isSelectedPhotos[indexPath.item] = true
+            }
+            
+        } else {
+            let selectedPhotoViewController = SelectedPhotoViewController()
+            selectedPhotoViewController.assets = assets
+            selectedPhotoViewController.photoIndex = indexPath.row
+            selectedPhotoViewController.albumType = albumType
+            selectedPhotoViewController.albumName = albumName
+            navigationController?.pushViewController(selectedPhotoViewController, animated: true)
+        }
     }
 }
 

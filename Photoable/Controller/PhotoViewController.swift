@@ -11,7 +11,7 @@ import PhotosUI
 class PhotoViewController: UIViewController {
 
     var assets = PHFetchResult<PHAsset>()
-    var albumTitle: String?
+    var albumName: String?
     var albumType: String?
     
     override func viewDidLoad() {
@@ -25,7 +25,7 @@ class PhotoViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         navigationItem.largeTitleDisplayMode = .never
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        navigationItem.title = albumTitle
+        navigationItem.title = albumName
         photoCollectionView.reloadData()
     }
     
@@ -107,6 +107,7 @@ extension PhotoViewController: UICollectionViewDataSource {
         selectedPhotoViewController.assets = assets
         selectedPhotoViewController.photoIndex = indexPath.row
         selectedPhotoViewController.albumType = albumType
+        selectedPhotoViewController.albumName = albumName
         navigationController?.pushViewController(selectedPhotoViewController, animated: true)
     }
 }

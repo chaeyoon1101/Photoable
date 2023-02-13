@@ -175,7 +175,7 @@ extension AlbumViewController: UICollectionViewDataSource {
         let albumType = self.albums[indexPath.item].albumType
         let photoCollectionViewController = PhotoViewController()
         photoCollectionViewController.assets = assets
-        photoCollectionViewController.albumTitle = title
+        photoCollectionViewController.albumName = title
         photoCollectionViewController.albumType = albumType
         navigationController?.pushViewController(photoCollectionViewController, animated: true)
     }

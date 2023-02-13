@@ -12,6 +12,7 @@ class SelectedPhotoViewController: UIViewController {
     var assets = PHFetchResult<PHAsset>()
     var photoIndex = 0
     var albumType: String?
+    var albumName: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -92,17 +93,40 @@ class SelectedPhotoViewController: UIViewController {
     }
                                            
     @objc private func tapDeleteButton() {
+        var actions = [AlertModel]()
         let imageManager = ImageManager()
-        var assetIdentifiers = [assets[photoIndex].localIdentifier]
+        let albumManager = AlbumManager()
+        let assetIdentifiers = [assets[photoIndex].localIdentifier]
         
-        imageManager.deleteImages(assetIdentifiers: assetIdentifiers) { result in
-            switch result {
-            case .success(let deletedImageCount):
-                print("사진 \(deletedImageCount)장 삭제 완료")
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
+        if albumType == "userAlbum" {
+            actions.append(AlertModel(title: "앨범에서 제거", style: .default, handler: { [self] _ in
+                albumManager.removeImages(assetIdentifiers: assetIdentifiers, toAlbum: albumName ?? "이름 없음") { result in
+                    switch result {
+                    case .success((let albumName, let deletedImageCount)):
+                        print("사진 \(deletedImageCount)장  \(albumName) 앨범에서 삭제 완료")
+                    case .failure(let error):
+                        print(error)
+                    }
+                }
+            }))
         }
+        
+        actions.append(AlertModel(title: "영구적으로 삭제", style: .destructive, handler: {_ in
+            imageManager.deleteImages(assetIdentifiers: assetIdentifiers) { result in
+                switch result {
+                case .success(let deletedImageCount):
+                    print("사진 \(deletedImageCount)장 삭제 완료")
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        }))
+        
+        actions.append(AlertModel(title: "취소", style: .cancel, handler: { _ in
+            print("취소")
+        }))
+        
+        alert(title: "이 사진을 영구적으로 삭제하시겠습니까? 아니면 이 앨범에서 제거하시겠습니까?", message: "", actions: actions)
     }
     
     @objc private func tapAddPhotoToAlbumButton() {
@@ -256,5 +280,16 @@ extension SelectedPhotoViewController: PHPhotoLibraryChangeObserver {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: NSNotification.Name("photoLibraryDidChange"), object: change.fetchResultAfterChanges)
         }
+    }
+}
+
+extension SelectedPhotoViewController {
+    private func alert(title: String, message: String, actions: [AlertModel] = []) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+        actions.forEach { action in
+            alert.addAction(UIAlertAction(title: action.title, style: action.style, handler: action.handler))
+        }
+        
+        present(alert, animated: true)
     }
 }

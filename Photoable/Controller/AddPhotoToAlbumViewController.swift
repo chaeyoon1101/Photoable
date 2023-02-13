@@ -18,6 +18,7 @@ class AddPhotoToAlbumViewController: UIViewController {
         setUILayout()
         configurationCollectionView()
         fetchAlbum()
+        PHPhotoLibrary.shared().register(self)
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
         self.view.backgroundColor = .systemBackground
         // Do any additional setup after loading the view.
@@ -145,9 +146,6 @@ extension AddPhotoToAlbumViewController: UICollectionViewDataSource {
         albumManager.addImages(assetIdentifiers: assetIdentifiers, toAlbum: albums[indexPath.item].title) { result in
             switch result {
             case .success((let albumName, let imageCount)):
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: NSNotification.Name("photoLibraryDidChange"), object: nil)
-                }
                 self.dismissViewController()
                 print("\(albumName) 앨범에 사진 \(imageCount)장 추가")
                 

@@ -9,6 +9,7 @@ class AlbumViewController: UIViewController {
         setUILayout()
         configurationCollectionView()
         pickPhoto()
+        PHPhotoLibrary.shared().register(self)
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
         // Do any additional setup after loading the view.
     }

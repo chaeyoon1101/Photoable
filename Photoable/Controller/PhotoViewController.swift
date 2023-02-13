@@ -25,6 +25,7 @@ class PhotoViewController: UIViewController {
         setToolbar()
         isSelectedPhotos = [Bool](repeating: false, count: assets.count)
         navigationItem.rightBarButtonItem = selectPhotoButtonItem
+        PHPhotoLibrary.shared().register(self)
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
         moreButtonMenu = UIMenu(children: [
             UIAction(title: "삭제하기", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
@@ -44,17 +45,22 @@ class PhotoViewController: UIViewController {
         photoCollectionView.reloadData()
     }
     
-    @objc private func tapSelectPhotosButton() {
-        photoSelectStatus = .seletingPhotoStatus
-        navigationItem.rightBarButtonItem = cancleSelectPhotoButtonItem
-        toolbar.isHidden = false
+    @objc private func selectPhotosStatus() {
+        DispatchQueue.main.async { [self] in
+            photoSelectStatus = .seletingPhotoStatus
+            navigationItem.rightBarButtonItem = cancleSelectPhotoButtonItem
+            toolbar.isHidden = false
+        }
     }
     
-    @objc private func tapCancleSelectPhotoButton() {
-        photoSelectStatus = .defaultStatus
-        navigationItem.rightBarButtonItem = selectPhotoButtonItem
-        toolbar.isHidden = true
-        deselectAllPhoto()
+    @objc private func cancleSelectStatus() {
+        DispatchQueue.main.async { [self] in
+            photoSelectStatus = .defaultStatus
+            navigationItem.rightBarButtonItem = selectPhotoButtonItem
+            toolbar.isHidden = true
+            deselectAllPhoto()
+        }
+        
     }
     
     @objc private func handlePhotoLibraryDidChange(notification: Notification) {
@@ -84,10 +90,11 @@ class PhotoViewController: UIViewController {
                     case .failure(let error):
                         print(error)
                     }
+                    self.cancleSelectStatus()
                 }
             }))
         }
-
+        
         actions.append(AlertModel(title: "영구적으로 삭제", style: .destructive, handler: { [self] _ in
             imageManager.deleteImages(assetIdentifiers: selectedPhotoIdentifiers) { result in
                 switch result {
@@ -96,25 +103,32 @@ class PhotoViewController: UIViewController {
                 case .failure(let error):
                     print(error.localizedDescription)
                 }
+                self.cancleSelectStatus()
             }
         }))
-
+        
         actions.append(AlertModel(title: "취소", style: .cancel, handler: { _ in
             print("취소")
         }))
-
+        
         alert(title: "이 사진을 영구적으로 삭제하시겠습니까? \(albumType == "userAlbum" ? "아니면 이 앨범에서 제거하시겠습니까?" : "")", message: "", actions: actions)
     }
     
     private func deselectAllPhoto() {
         for index in 0..<assets.count {
-            if let cell = photoCollectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? PhotosCollectionViewCell {
-                cell.isSelectedPhoto = false
+            DispatchQueue.main.async {
+                if let cell = self.photoCollectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? PhotosCollectionViewCell {
+                    cell.isSelectedPhoto = false
+                }
             }
+            
         }
+        photoSelectStatus = .defaultStatus
         selectedPhotoIdentifiers = []
         isSelectedPhotos = [Bool](repeating: false, count: assets.count)
-        setToolbar()
+        DispatchQueue.main.async {
+            self.setToolbar()
+        }
     }
     
     private func configurationCollectionView() {
@@ -128,10 +142,14 @@ class PhotoViewController: UIViewController {
         let moreButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: moreButtonMenu)
         
         if selectedPhotoIdentifiers.count == 0 {
-            toolBarTitleLabel.text = "사진 선택"
+            
+            self.toolBarTitleLabel.text = "사진 선택"
+            
             moreButton.isEnabled = false
         } else {
-            toolBarTitleLabel.text = "\(selectedPhotoIdentifiers.count)장의 사진이 선택됨"
+            
+            self.toolBarTitleLabel.text = "\(self.selectedPhotoIdentifiers.count)장의 사진이 선택됨"
+            
             moreButton.isEnabled = true
         }
         
@@ -139,12 +157,15 @@ class PhotoViewController: UIViewController {
         let fiexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let items = [fiexibleSpace, titleView, fiexibleSpace, moreButton]
         
-        toolbar.setItems(items, animated: true)
+        
+        self.toolbar.setItems(items, animated: true)
+        
+        
     }
     
-    private lazy var selectPhotoButtonItem = UIBarButtonItem(title: "사진 선택", style: .done, target: self, action: #selector(tapSelectPhotosButton))
+    private lazy var selectPhotoButtonItem = UIBarButtonItem(title: "사진 선택", style: .done, target: self, action: #selector(selectPhotosStatus))
     
-    private lazy var cancleSelectPhotoButtonItem = UIBarButtonItem(title: "취소", style: .done, target: self, action: #selector(tapCancleSelectPhotoButton))
+    private lazy var cancleSelectPhotoButtonItem = UIBarButtonItem(title: "취소", style: .done, target: self, action: #selector(cancleSelectStatus))
     
     var moreButtonMenu: UIMenu = {
         let menu = UIMenu()

@@ -172,9 +172,11 @@ extension AlbumViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let assets = self.albums[indexPath.item].asset
         let title = self.albums[indexPath.item].title
+        let albumType = self.albums[indexPath.item].albumType
         let photoCollectionViewController = PhotoViewController()
         photoCollectionViewController.assets = assets
         photoCollectionViewController.albumTitle = title
+        photoCollectionViewController.albumType = albumType
         navigationController?.pushViewController(photoCollectionViewController, animated: true)
     }
 }

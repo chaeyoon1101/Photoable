@@ -12,6 +12,8 @@ class PhotoViewController: UIViewController {
 
     var assets = PHFetchResult<PHAsset>()
     var albumTitle: String?
+    var albumType: String?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUILayout()
@@ -102,9 +104,9 @@ extension PhotoViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedPhotoViewController = SelectedPhotoViewController()
-        selectedPhotoViewController.photos = assets
+        selectedPhotoViewController.assets = assets
         selectedPhotoViewController.photoIndex = indexPath.row
-
+        selectedPhotoViewController.albumType = albumType
         navigationController?.pushViewController(selectedPhotoViewController, animated: true)
     }
 }

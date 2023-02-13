@@ -43,6 +43,25 @@ struct AlbumManager {
         })
     }
     
+    func removeImages(assetIdentifiers: [String], toAlbum albumName: String, completion: @escaping (Result<(String, Int), Error>) -> Void) {
+        let assets = PHAsset.fetchAssets(withLocalIdentifiers: assetIdentifiers, options: nil)
+        
+        PHPhotoLibrary.shared().performChanges({
+            assets.enumerateObjects { asset, index, stop in
+                let albumChangeRequest = PHAssetCollectionChangeRequest(for: fetchAlbum(albumName: albumName))
+                albumChangeRequest?.removeAssets([asset] as NSArray)
+            }
+        }, completionHandler: { (success, error) in
+            if success {
+                completion(.success( (albumName, assets.count)))
+            } else {
+                if let error = error {
+                    completion(.failure(error))
+                }
+            }
+        })
+    }
+    
     func fetchAlbum(userCollection: Bool, smartCollection: Bool) -> [AlbumModel] {
         var albums = [AlbumModel]()
         
@@ -69,11 +88,11 @@ struct AlbumManager {
                     if let title = collection.localizedTitle, assets.count > 0 {
                         switch title {
                         case "Recents":
-                            albums.append(AlbumModel(asset: assets, title: "모든 사진", count: assets.count))
+                            albums.append(AlbumModel(asset: assets, title: "모든 사진", count: assets.count, albumType: "smartAlbum"))
                         case "Favorites":
-                            albums.append(AlbumModel(asset: assets, title: "내가 좋아하는 사진", count: assets.count))
+                            albums.append(AlbumModel(asset: assets, title: "내가 좋아하는 사진", count: assets.count, albumType: "smartAlbum"))
                         case "Hidden":
-                            albums.append(AlbumModel(asset: assets, title: "숨겨진 사진", count: assets.count))
+                            albums.append(AlbumModel(asset: assets, title: "숨겨진 사진", count: assets.count, albumType: "smartAlbum"))
                         default:
                             break
                         }
@@ -91,7 +110,7 @@ struct AlbumManager {
                 fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
                 
                 let assets = PHAsset.fetchAssets(in: collection, options: fetchOptions)
-                albums.append(AlbumModel(asset: assets, title: collection.localizedTitle ?? "이름 없음", count: assets.count))
+                albums.append(AlbumModel(asset: assets, title: collection.localizedTitle ?? "이름 없음", count: assets.count, albumType: "userAlbum"))
             }
         }
         

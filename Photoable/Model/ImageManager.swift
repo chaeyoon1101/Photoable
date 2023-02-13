@@ -30,4 +30,22 @@ struct ImageManager {
             }
         })
     }
+    
+    func deleteImages(assetIdentifiers: [String], completion: @escaping (Result<Int, Error>) -> Void) {
+        let assets = PHAsset.fetchAssets(withLocalIdentifiers: assetIdentifiers, options: nil)
+
+        PHPhotoLibrary.shared().performChanges({
+            assets.enumerateObjects { asset, index, stop in
+                PHAssetChangeRequest.deleteAssets([asset] as NSArray)
+            }
+        }, completionHandler: { (success, error) in
+            if success {
+                completion(.success(assetIdentifiers.count))
+            } else {
+                if let error = error {
+                    completion(.failure(error))
+                }
+            }
+        })
+    }
 }

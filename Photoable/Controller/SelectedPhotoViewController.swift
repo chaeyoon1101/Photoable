@@ -9,13 +9,14 @@ import UIKit
 import PhotosUI
 
 class SelectedPhotoViewController: UIViewController {
-    var photos = PHFetchResult<PHAsset>()
+    var assets = PHFetchResult<PHAsset>()
     var photoIndex = 0
+    var albumType: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setNavigationBar()
-        setToolbar(isFavorite: photos[photoIndex].isFavorite)
+        setToolbar(isFavorite: assets[photoIndex].isFavorite)
         setUILayout()
         configurationCollectionView()
         PHPhotoLibrary.shared().register(self)
@@ -43,7 +44,7 @@ class SelectedPhotoViewController: UIViewController {
     private func setNavigationBar() {
         let rightButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), style: .plain, target: self, action: nil)
         let photoCreateDateView = PhotoCreateDateView()
-        photoCreateDateView.setLabel(date: photos[photoIndex].creationDate)
+        photoCreateDateView.setLabel(date: assets[photoIndex].creationDate)
         self.navigationItem.titleView = photoCreateDateView
         self.navigationItem.rightBarButtonItem = rightButton
         
@@ -70,9 +71,9 @@ class SelectedPhotoViewController: UIViewController {
     }
     
     @objc private func tapFavoriteButton() {
-        let isFavoritePhoto = self.photos[photoIndex].isFavorite
+        let isFavoritePhoto = self.assets[photoIndex].isFavorite
         PHPhotoLibrary.shared().performChanges({ [self] in
-            let asset = self.photos[photoIndex]
+            let asset = self.assets[photoIndex]
             let changeRequest = PHAssetChangeRequest(for: asset)
             
             if isFavoritePhoto {
@@ -91,21 +92,23 @@ class SelectedPhotoViewController: UIViewController {
     }
                                            
     @objc private func tapDeleteButton() {
-        let asset: PHAsset = self.photos[photoIndex]
+        let imageManager = ImageManager()
+        var assetIdentifiers = [assets[photoIndex].localIdentifier]
         
-        PHPhotoLibrary.shared().performChanges({
-            PHAssetChangeRequest.deleteAssets([asset] as NSArray)
-        }, completionHandler: { (_, error) in
-            if let error = error {
-                print("Error deleting photo: \(error.localizedDescription)")
+        imageManager.deleteImages(assetIdentifiers: assetIdentifiers) { result in
+            switch result {
+            case .success(let deletedImageCount):
+                print("사진 \(deletedImageCount)장 삭제 완료")
+            case .failure(let error):
+                print(error.localizedDescription)
             }
-        })
+        }
     }
     
     @objc private func tapAddPhotoToAlbumButton() {
         let addPhotoToAlbumViewController = AddPhotoToAlbumViewController()
         
-        addPhotoToAlbumViewController.assets = [photos[photoIndex]]
+        addPhotoToAlbumViewController.assets = [assets[photoIndex]]
         self.present(addPhotoToAlbumViewController, animated: true)
     }
     
@@ -115,7 +118,7 @@ class SelectedPhotoViewController: UIViewController {
     
     @objc private func handlePhotoLibraryDidChange(notification: Notification) {
         if let asset = notification.object as? PHFetchResult<PHAsset> {
-            self.photos = asset
+            self.assets = asset
         }
         
         print("SelectedViewController 변경")
@@ -175,12 +178,12 @@ class SelectedPhotoViewController: UIViewController {
 
 extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photos.count
+        return assets.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cellIdentifier = SelectedPhotosCollectionViewCell.identifier
-        let asset = self.photos[indexPath.item]
+        let asset = self.assets[indexPath.item]
         
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? SelectedPhotosCollectionViewCell else {
             return UICollectionViewCell()
@@ -211,7 +214,7 @@ extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionV
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         photoIndex = Int(targetContentOffset.pointee.x / view.frame.width)
-        setToolbar(isFavorite: photos[photoIndex].isFavorite)
+        setToolbar(isFavorite: assets[photoIndex].isFavorite)
         self.setNavigationBar()
         
     }
@@ -246,7 +249,7 @@ extension SelectedPhotoViewController: UICollectionViewDelegateFlowLayout {
 
 extension SelectedPhotoViewController: PHPhotoLibraryChangeObserver {
     func photoLibraryDidChange(_ changeInstance: PHChange) {
-        guard let change = changeInstance.changeDetails(for: photos) else {
+        guard let change = changeInstance.changeDetails(for: assets) else {
             return
         }
         

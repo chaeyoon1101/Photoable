@@ -103,7 +103,7 @@ class SelectedPhotoViewController: UIViewController {
                 albumManager.removeImages(assetIdentifiers: assetIdentifiers, toAlbum: albumName ?? "이름 없음") { result in
                     switch result {
                     case .success((let albumName, let deletedImageCount)):
-                        print("사진 \(deletedImageCount)장  \(albumName) 앨범에서 삭제 완료")
+                        print("사진 \(deletedImageCount)장 \(albumName) 앨범에서 삭제 완료")
                     case .failure(let error):
                         print(error)
                     }
@@ -126,7 +126,7 @@ class SelectedPhotoViewController: UIViewController {
             print("취소")
         }))
         
-        alert(title: "이 사진을 영구적으로 삭제하시겠습니까? 아니면 이 앨범에서 제거하시겠습니까?", message: "", actions: actions)
+        alert(title: "이 사진을 영구적으로 삭제하시겠습니까? \(albumType == "userAlbum" ? "아니면 이 앨범에서 제거하시겠습니까?" : "")", message: "", actions: actions)
     }
     
     @objc private func tapAddPhotoToAlbumButton() {

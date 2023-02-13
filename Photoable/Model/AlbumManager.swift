@@ -24,31 +24,17 @@ struct AlbumManager {
         })
     }
     
-    func addImages(assets: [PHAsset], toAlbum albumName: String, completion: @escaping (Result<(String, Int), Error>) -> Void) {
-        var images = [UIImage]()
-        for asset in assets {
-            if let cacheImage = ImageCache.shared.image(forKey: asset.localIdentifier) {
-                images.append(cacheImage)
-            } else {
-                let imageManager = ImageManager()
-                imageManager.fetchImage(asset: asset) { image in
-                    images.append(image)
-                }
-            }
-        }
+    func addImages(assetIdentifiers: [String], toAlbum albumName: String, completion: @escaping (Result<(String, Int), Error>) -> Void) {
+        let assets = PHAsset.fetchAssets(withLocalIdentifiers: assetIdentifiers, options: nil)
         
         PHPhotoLibrary.shared().performChanges({
-            var assetPlaceholders = [PHObjectPlaceholder]()
-            for image in images {
-                let assetChangeRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
-                assetPlaceholders.append(assetChangeRequest.placeholderForCreatedAsset!)
+            assets.enumerateObjects { asset, index, stop in
+                let albumChangeRequest = PHAssetCollectionChangeRequest(for: fetchAlbum(albumName: albumName))
+                albumChangeRequest?.addAssets([asset] as NSArray)
             }
-            
-            let albumChangeRequest = PHAssetCollectionChangeRequest(for: fetchAlbum(albumName: albumName))
-            albumChangeRequest!.addAssets(NSArray(array: assetPlaceholders))
-        }, completionHandler: { success, error in
+        }, completionHandler: { (success, error) in
             if success {
-                completion(.success( (albumName, images.count)))
+                completion(.success( (albumName, assets.count)))
             } else {
                 if let error = error {
                     completion(.failure(error))
@@ -115,6 +101,7 @@ struct AlbumManager {
     func fetchAlbum(albumName: String) -> PHAssetCollection {
         let fetchOptions = PHFetchOptions()
         fetchOptions.predicate = NSPredicate(format: "title = %@", albumName)
+        
         let collections = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
         
         if let firstObject = collections.firstObject {

@@ -46,8 +46,9 @@ class PhotoViewController: UIViewController {
     }
     
     @objc private func selectPhotosStatus() {
+        photoSelectStatus = .seletingPhotoStatus
+        isSelectedPhotos = [Bool](repeating: false, count: assets.count)
         DispatchQueue.main.async { [self] in
-            photoSelectStatus = .seletingPhotoStatus
             navigationItem.rightBarButtonItem = cancleSelectPhotoButtonItem
             toolbar.isHidden = false
         }
@@ -55,12 +56,11 @@ class PhotoViewController: UIViewController {
     
     @objc private func cancleSelectStatus() {
         DispatchQueue.main.async { [self] in
-            photoSelectStatus = .defaultStatus
             navigationItem.rightBarButtonItem = selectPhotoButtonItem
             toolbar.isHidden = true
-            deselectAllPhoto()
         }
-        
+        photoSelectStatus = .defaultStatus
+        deselectAllPhoto()
     }
     
     @objc private func handlePhotoLibraryDidChange(notification: Notification) {
@@ -121,11 +121,9 @@ class PhotoViewController: UIViewController {
                     cell.isSelectedPhoto = false
                 }
             }
-            
         }
         photoSelectStatus = .defaultStatus
         selectedPhotoIdentifiers = []
-        isSelectedPhotos = [Bool](repeating: false, count: assets.count)
         DispatchQueue.main.async {
             self.setToolbar()
         }
@@ -159,8 +157,6 @@ class PhotoViewController: UIViewController {
         
         
         self.toolbar.setItems(items, animated: true)
-        
-        
     }
     
     private lazy var selectPhotoButtonItem = UIBarButtonItem(title: "사진 선택", style: .done, target: self, action: #selector(selectPhotosStatus))
@@ -226,7 +222,6 @@ extension PhotoViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? PhotosCollectionViewCell else {
             return UICollectionViewCell()
         }
-        
         
         let asset = self.assets[indexPath.item]
         cell.representedAssetIdentifier = asset.localIdentifier

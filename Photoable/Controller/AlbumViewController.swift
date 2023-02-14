@@ -130,7 +130,7 @@ class AlbumViewController: UIViewController {
         for index in 0..<albums.count {
             DispatchQueue.main.async {
                 if let cell = self.albumCollectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? AlbumCollectionViewCell {
-                    cell.isEditingView = self.albumEditStatus == .editingStatus && self.albums[index].albumType != "smartAlbum" ? true : false
+                    cell.isEditingView = self.albumEditStatus == .editingStatus && self.albums[index].albumType == "userAlbum" ? true : false
                 }
             }
         }
@@ -187,7 +187,7 @@ extension AlbumViewController: UICollectionViewDataSource {
         
         cell.deleteButton.tag = indexPath.item
         cell.deleteButton.addTarget(self, action: #selector(deleteAlbum), for: .touchUpInside)
-        cell.isEditingView = self.albumEditStatus == .editingStatus && album.albumType != "smartAlbum" ? true : false
+        cell.isEditingView = self.albumEditStatus == .editingStatus && album.albumType == "userAlbum" ? true : false
         cell.titleLabel.text = album.title
         cell.countLabel.text = "사진 \(album.count)장"
         

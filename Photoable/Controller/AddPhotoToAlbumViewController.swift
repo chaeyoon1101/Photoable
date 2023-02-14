@@ -13,6 +13,7 @@ class AddPhotoToAlbumViewController: UIViewController {
     var assets = [PHAsset]()
     var albums = [AlbumModel]()
     var assetIdentifiers = [String]()
+    let albumManager = AlbumManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,8 +27,7 @@ class AddPhotoToAlbumViewController: UIViewController {
     }
     
     private func fetchAlbum() {
-        let albumManger = AlbumManager()
-        self.albums = albumManger.fetchAlbum(userCollection: true, smartCollection: false)
+        self.albums = albumManager.fetchAlbum(userCollection: true, smartCollection: false)
     }
     
     @objc private func dismissViewController() {
@@ -43,20 +43,50 @@ class AddPhotoToAlbumViewController: UIViewController {
         self.albumCollectionView.reloadData()
     }
     
+    @objc private func tapCreateAlbumButton() {
+        let alert = UIAlertController(title: "새로운 앨범", message: "앨범의 이름을 입력해주세요", preferredStyle: .alert)
+        let cancleAction = UIAlertAction(title: "취소", style: .default, handler: nil)
+        let createAction = UIAlertAction(title: "생성", style: .default, handler: { action in
+            let albumName = alert.textFields?[0].text ?? ""
+            self.createAlbum(albumName: albumName)
+            
+        })
+        
+        alert.addTextField { (inputNewNickName) in
+            inputNewNickName.placeholder = "앨범 이름"
+        }
+        alert.addAction(cancleAction)
+        alert.addAction(createAction)
+        present(alert,animated: true,completion: nil)
+    }
+    
+    
+    private func createAlbum(albumName: String) {
+        albumManager.createAlbum(albumName) { result in
+            switch result {
+            case .success(let albumName):
+                print("\(albumName) 앨범 삭제 완료")
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
     private func configurationCollectionView() {
         albumCollectionView.delegate = self
         albumCollectionView.dataSource = self
-        let cellIdentifier = AlbumCollectionViewCell.identifier
-        albumCollectionView.register(AlbumCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
+        let cellIdentifier = AddPhotoToAlbumCollectionViewCell.identifier
+        albumCollectionView.register(AddPhotoToAlbumCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
     }
     
     private lazy var navigationBar: UINavigationBar = {
         let navigationBar = UINavigationBar(frame: .zero)
         let navigationItem = UINavigationItem(title: "앨범에 추가")
         let rightItem = UIBarButtonItem(title: "취소", style: .done, target: self, action: #selector(dismissViewController))
+        let leftItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .done, target: self, action: #selector(tapCreateAlbumButton))
         
         navigationBar.pushItem(navigationItem, animated: false)
         navigationBar.topItem?.rightBarButtonItem = rightItem
+        navigationBar.topItem?.leftBarButtonItem = leftItem
         
         return navigationBar
     }()
@@ -97,8 +127,8 @@ extension AddPhotoToAlbumViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cellIdentifier = AlbumCollectionViewCell.identifier
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? AlbumCollectionViewCell else {
+        let cellIdentifier = AddPhotoToAlbumCollectionViewCell.identifier
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? AddPhotoToAlbumCollectionViewCell else {
             return UICollectionViewCell()
         }
         
@@ -137,8 +167,6 @@ extension AddPhotoToAlbumViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let albumManager = AlbumManager()
-        
         albumManager.addImages(assetIdentifiers: assetIdentifiers, toAlbum: albums[indexPath.item].title) { result in
             switch result {
             case .success((let albumName, let imageCount)):

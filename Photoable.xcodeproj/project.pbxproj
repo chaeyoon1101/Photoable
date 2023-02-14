@@ -16,6 +16,7 @@
 		2B431676299A4D8000199381 /* ImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B431675299A4D8000199381 /* ImageManager.swift */; };
 		2B431678299A8EA200199381 /* PhotoSelectStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B431677299A8EA200199381 /* PhotoSelectStatus.swift */; };
 		2B43167A299B8FCB00199381 /* AlbumEditStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B431679299B8FCB00199381 /* AlbumEditStatus.swift */; };
+		2B43167C299B960800199381 /* AddPhotoToAlbumCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B43167B299B960800199381 /* AddPhotoToAlbumCollectionViewCell.swift */; };
 		2B5016AD2952068400547019 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016AC2952068400547019 /* AppDelegate.swift */; };
 		2B5016AF2952068400547019 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016AE2952068400547019 /* SceneDelegate.swift */; };
 		2B5016B12952068400547019 /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016B02952068400547019 /* PhotoViewController.swift */; };
@@ -40,6 +41,7 @@
 		2B431675299A4D8000199381 /* ImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageManager.swift; sourceTree = "<group>"; };
 		2B431677299A8EA200199381 /* PhotoSelectStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoSelectStatus.swift; sourceTree = "<group>"; };
 		2B431679299B8FCB00199381 /* AlbumEditStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumEditStatus.swift; sourceTree = "<group>"; };
+		2B43167B299B960800199381 /* AddPhotoToAlbumCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPhotoToAlbumCollectionViewCell.swift; sourceTree = "<group>"; };
 		2B5016A92952068400547019 /* Photoable.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photoable.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B5016AC2952068400547019 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B5016AE2952068400547019 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -148,6 +150,7 @@
 				2B5A5B49298A43FA0081CF56 /* PhotosCollectionViewCell.swift */,
 				2B4316662999189400199381 /* SelectedPhotosCollectionViewCell.swift */,
 				2B43166829994EE000199381 /* AlbumCollectionViewCell.swift */,
+				2B43167B299B960800199381 /* AddPhotoToAlbumCollectionViewCell.swift */,
 			);
 			path = CollectionViewCell;
 			sourceTree = "<group>";
@@ -254,6 +257,7 @@
 				2B5016AD2952068400547019 /* AppDelegate.swift in Sources */,
 				2B431678299A8EA200199381 /* PhotoSelectStatus.swift in Sources */,
 				2B43167A299B8FCB00199381 /* AlbumEditStatus.swift in Sources */,
+				2B43167C299B960800199381 /* AddPhotoToAlbumCollectionViewCell.swift in Sources */,
 				2B5A5B4E298A722C0081CF56 /* AlertModel.swift in Sources */,
 				2B5016AF2952068400547019 /* SceneDelegate.swift in Sources */,
 				2B4316672999189400199381 /* SelectedPhotosCollectionViewCell.swift in Sources */,

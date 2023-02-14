@@ -11,6 +11,7 @@ import PhotosUI
 class SelectedPhotoViewController: UIViewController {
     var assets = PHFetchResult<PHAsset>()
     var photoIndex = 0
+    var albumIdentifier: String?
     var albumType: String?
     var albumName: String?
     let imageManager = PHCachingImageManager()
@@ -101,7 +102,7 @@ class SelectedPhotoViewController: UIViewController {
         
         if albumType == "userAlbum" {
             actions.append(AlertModel(title: "앨범에서 제거", style: .default, handler: { [self] _ in
-                albumManager.removeImages(assetIdentifiers: assetIdentifiers, toAlbum: albumName ?? "이름 없음") { result in
+                albumManager.removeImages(assetIdentifiers: assetIdentifiers, toAlbum: albumIdentifier ?? "") { result in
                     switch result {
                     case .success((let albumName, let deletedImageCount)):
                         print("사진 \(deletedImageCount)장 \(albumName) 앨범에서 삭제 완료")
@@ -133,7 +134,7 @@ class SelectedPhotoViewController: UIViewController {
     @objc private func tapAddPhotoToAlbumButton() {
         let addPhotoToAlbumViewController = AddPhotoToAlbumViewController()
         
-        addPhotoToAlbumViewController.assets = [assets[photoIndex]]
+        addPhotoToAlbumViewController.assetIdentifiers = [assets[photoIndex].localIdentifier]
         self.present(addPhotoToAlbumViewController, animated: true)
     }
     

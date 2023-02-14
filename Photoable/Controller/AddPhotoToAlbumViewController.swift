@@ -10,7 +10,6 @@ import Photos
 
 class AddPhotoToAlbumViewController: UIViewController {
     
-    var assets = [PHAsset]()
     var albums = [AlbumModel]()
     var assetIdentifiers = [String]()
     let albumManager = AlbumManager()
@@ -167,12 +166,12 @@ extension AddPhotoToAlbumViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        albumManager.addImages(assetIdentifiers: assetIdentifiers, toAlbum: albums[indexPath.item].title) { result in
+        print(assetIdentifiers)
+        albumManager.addImages(assetIdentifiers: assetIdentifiers, toAlbum: albums[indexPath.item].identifier) { result in
             switch result {
             case .success((let albumName, let imageCount)):
                 self.dismissViewController()
                 print("\(albumName) 앨범에 사진 \(imageCount)장 추가")
-                
             case .failure(let error):
                 print(error)
             }

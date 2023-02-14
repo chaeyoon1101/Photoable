@@ -11,6 +11,7 @@ import PhotosUI
 class PhotoViewController: UIViewController {
     
     var assets = PHFetchResult<PHAsset>()
+    var albumIdentifier: String?
     var albumName: String?
     var albumType: String?
     var photoSelectStatus: PhotoSelectStatus = .defaultStatus
@@ -84,7 +85,6 @@ class PhotoViewController: UIViewController {
         let imageManager = ImageManager()
         let albumManager = AlbumManager()
         
-        print(selectedPhotoIdentifiers)
         if albumType == "userAlbum" {
             actions.append(AlertModel(title: "앨범에서 제거", style: .default, handler: { [self] _ in
                 albumManager.removeImages(assetIdentifiers: selectedPhotoIdentifiers, toAlbum: albumName ?? "이름 없음") { result in
@@ -285,6 +285,7 @@ extension PhotoViewController: UICollectionViewDataSource {
             selectedPhotoViewController.photoIndex = indexPath.row
             selectedPhotoViewController.albumType = albumType
             selectedPhotoViewController.albumName = albumName
+            selectedPhotoViewController.albumIdentifier = albumIdentifier
             navigationController?.pushViewController(selectedPhotoViewController, animated: true)
         }
     }

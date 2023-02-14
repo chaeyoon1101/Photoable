@@ -78,6 +78,7 @@ struct AlbumManager {
         if smartCollection {
             smartCollections.enumerateObjects { collection, index, stop in
                 if collection.estimatedAssetCount > 0 {
+                    print(collection.localIdentifier)
                     let fetchOptions = PHFetchOptions()
                     fetchOptions.sortDescriptors = [
                         NSSortDescriptor(key: "creationDate", ascending: false)
@@ -88,11 +89,11 @@ struct AlbumManager {
                     if let title = collection.localizedTitle, assets.count > 0 {
                         switch title {
                         case "Recents":
-                            albums.append(AlbumModel(asset: assets, title: "모든 사진", count: assets.count, albumType: "smartAlbum"))
+                            albums.append(AlbumModel(asset: assets, identifier: collection.localIdentifier, title: "모든 사진", count: assets.count, albumType: "smartAlbum"))
                         case "Favorites":
-                            albums.append(AlbumModel(asset: assets, title: "내가 좋아하는 사진", count: assets.count, albumType: "smartAlbum"))
+                            albums.append(AlbumModel(asset: assets, identifier: collection.localIdentifier, title: "내가 좋아하는 사진", count: assets.count, albumType: "smartAlbum"))
                         case "Hidden":
-                            albums.append(AlbumModel(asset: assets, title: "숨겨진 사진", count: assets.count, albumType: "smartAlbum"))
+                            albums.append(AlbumModel(asset: assets, identifier: collection.localIdentifier, title: "숨겨진 사진", count: assets.count, albumType: "smartAlbum"))
                         default:
                             break
                         }
@@ -110,7 +111,7 @@ struct AlbumManager {
                 fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
                 
                 let assets = PHAsset.fetchAssets(in: collection, options: fetchOptions)
-                albums.append(AlbumModel(asset: assets, title: collection.localizedTitle ?? "이름 없음", count: assets.count, albumType: "userAlbum"))
+                albums.append(AlbumModel(asset: assets, identifier: collection.localIdentifier, title: collection.localizedTitle ?? "이름 없음", count: assets.count, albumType: "userAlbum"))
             }
         }
         
@@ -130,6 +131,29 @@ struct AlbumManager {
         return PHAssetCollection()
     }
     
+    func fetchAlbum(identifier: String) -> PHAssetCollection {
+        guard let album = PHAssetCollection.fetchAssetCollections(withLocalIdentifiers: [identifier], options: nil).firstObject else {
+            return PHAssetCollection()
+        }
+        
+        return album
+    }
+    
+    func deleteAlbum(identifier: String, completion: @escaping (Result<String, Error>) -> Void) {
+        let album = fetchAlbum(identifier: identifier)
+        
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetCollectionChangeRequest.deleteAssetCollections([album] as NSFastEnumeration)
+        }, completionHandler: { success, error in
+            if success {
+                completion(.success(album.localizedTitle ?? ""))
+            } else {
+                if let error = error {
+                    completion(.failure(error))
+                }
+            }
+        })
+    }
     
     
 }

@@ -10,6 +10,16 @@ import UIKit
 class AlbumCollectionViewCell: UICollectionViewCell {
     static let identifier = "AlbumCollectionViewCell"
     var representedAssetIdentifier: String?
+
+    var isEditingView: Bool? {
+        didSet {
+            if isEditingView == true {
+                deleteButton.isHidden = false
+            } else {
+                deleteButton.isHidden = true
+            }
+        }
+    }
     
     var image: UIImageView = {
         let imageView = UIImageView()
@@ -38,8 +48,22 @@ class AlbumCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    lazy var deleteButton: UIButton = {
+        let button = UIButton(type: .system)
+        let imageConfig = UIImage.SymbolConfiguration(pointSize: 18, weight: .light)
+        
+        button.setImage(UIImage(systemName: "minus.circle.fill", withConfiguration: imageConfig), for: .normal)
+        button.tintColor = .red
+        button.backgroundColor = .label
+        button.layer.cornerRadius = 10.5
+        button.isHidden = true
+        
+        return button
+    }()
+    
     override init(frame: CGRect) {
        super.init(frame: frame)
+        isEditingView = false
        self.setUILayout()
    }
    
@@ -48,7 +72,7 @@ class AlbumCollectionViewCell: UICollectionViewCell {
    }
     
     private func setUILayout() {
-        let views = [image, titleLabel, countLabel]
+        let views = [image, titleLabel, countLabel, deleteButton]
         
         views.forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -57,12 +81,14 @@ class AlbumCollectionViewCell: UICollectionViewCell {
         NSLayoutConstraint.activate([
             image.topAnchor.constraint(equalTo: self.topAnchor),
             image.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -40),
-            image.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            image.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            image.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
+            image.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -10),
             titleLabel.topAnchor.constraint(equalTo: image.bottomAnchor, constant: 5),
-            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 5),
+            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 15),
             countLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
-            countLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 5)
+            countLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 15),
+            deleteButton.topAnchor.constraint(equalTo: self.image.topAnchor, constant: -5),
+            deleteButton.leadingAnchor.constraint(equalTo: self.image.leadingAnchor, constant: -5)
         ])
     }
 }

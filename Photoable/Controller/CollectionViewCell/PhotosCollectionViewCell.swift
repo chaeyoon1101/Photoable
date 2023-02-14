@@ -65,7 +65,6 @@ class PhotosCollectionViewCell: UICollectionViewCell {
             image.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             selectMark.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
             selectMark.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
-            
         ])
     }
 }

@@ -248,8 +248,6 @@ extension PhotoViewController: UICollectionViewDataSource {
             })
         }
         
-        print("===========================")
-        print("\(isSelectedPhotos)", assets.count, indexPath.item)
         if isSelectedPhotos[indexPath.item] == true {
             cell.isSelectedPhoto = true
         } else {

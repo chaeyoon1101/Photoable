@@ -4,6 +4,9 @@ import Photos
 class AlbumViewController: UIViewController {
 
     var albums = [AlbumModel]()
+    var albumEditStatus: AlbumEditStatus = .defaultStatus
+    let albumManager = AlbumManager()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUILayout()
@@ -15,9 +18,7 @@ class AlbumViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        navigationItem.title = "나의 앨범"
+        setNavigationBar()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -84,8 +85,15 @@ class AlbumViewController: UIViewController {
     }
     
     private func pickPhoto() {
-        let albumManager = AlbumManager()
         self.albums = albumManager.fetchAlbum(userCollection: true, smartCollection: true)
+    }
+    
+    private func setNavigationBar() {
+        navigationController?.navigationBar.prefersLargeTitles = true
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        navigationItem.title = "나의 앨범"
+//        let settingBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gearshape.fill"), style: .plain, target: self, action: nil)
+        navigationItem.rightBarButtonItems = [editBarButtonItem]
     }
     
     @objc private func handlePhotoLibraryDidChange(notification: Notification) {
@@ -94,12 +102,50 @@ class AlbumViewController: UIViewController {
         self.albumCollectionView.reloadData()
     }
     
+    @objc private func tapEditAlbumButton() {
+        navigationItem.rightBarButtonItems = [editCompleteBarButtonItem]
+        albumEditStatus = .editingStatus
+        changeDeleteButtonsShowing()
+    }
+    
+    @objc private func tapEditCompleteButton() {
+        navigationItem.rightBarButtonItems = [editBarButtonItem]
+        albumEditStatus = .defaultStatus
+        changeDeleteButtonsShowing()
+    }
+    
+    private lazy var editBarButtonItem = UIBarButtonItem(title: "편집", style: .done, target: self, action: #selector(tapEditAlbumButton))
+    
+    private lazy var editCompleteBarButtonItem = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(tapEditCompleteButton))
+    
     let albumCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
+
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         
         return collectionView
     }()
+    
+    private func changeDeleteButtonsShowing() {
+        for index in 0..<albums.count {
+            DispatchQueue.main.async {
+                if let cell = self.albumCollectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? AlbumCollectionViewCell {
+                    cell.isEditingView = self.albumEditStatus == .editingStatus && self.albums[index].albumType != "smartAlbum" ? true : false
+                }
+            }
+        }
+    }
+    
+    @objc private func deleteAlbum(sender: UIButton) {
+        albumManager.deleteAlbum(identifier: albums[sender.tag].identifier) { result in
+            switch result {
+            case .success(let albumName):
+                print("\(albumName) 앨범 삭제 완료")
+            case .failure(let error):
+                print("\(error.localizedDescription)")
+            }
+        }
+    }
     
     private func configurationCollectionView() {
         albumCollectionView.delegate = self
@@ -120,8 +166,8 @@ class AlbumViewController: UIViewController {
         NSLayoutConstraint.activate([
             albumCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             albumCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            albumCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
-            albumCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15),
+            albumCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            albumCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
         ])
     }
 }
@@ -139,6 +185,9 @@ extension AlbumViewController: UICollectionViewDataSource {
         
         let album = self.albums[indexPath.item]
         
+        cell.deleteButton.tag = indexPath.item
+        cell.deleteButton.addTarget(self, action: #selector(deleteAlbum), for: .touchUpInside)
+        cell.isEditingView = self.albumEditStatus == .editingStatus && album.albumType != "smartAlbum" ? true : false
         cell.titleLabel.text = album.title
         cell.countLabel.text = "사진 \(album.count)장"
         
@@ -171,6 +220,9 @@ extension AlbumViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if albumEditStatus == .editingStatus {
+            return
+        }
         let assets = self.albums[indexPath.item].asset
         let title = self.albums[indexPath.item].title
         let albumType = self.albums[indexPath.item].albumType
@@ -184,7 +236,7 @@ extension AlbumViewController: UICollectionViewDataSource {
 
 extension AlbumViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.frame.width / 2 - 20
+        let width = collectionView.frame.width / 2 - 5
         let height = width + 40
         let size = CGSize(width: width, height: height)
         
@@ -196,7 +248,7 @@ extension AlbumViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 30
+        return 5
     }
 }
 

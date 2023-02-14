@@ -31,10 +31,10 @@ class PhotoViewController: UIViewController {
             UIAction(title: "삭제하기", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
                 self.deletePhotos()
             },
-            UIAction(title: "앨범에 추가하기", image: UIImage(systemName: "rectangle.stack.badge.plus")) { _ in print(1)
+            UIAction(title: "앨범에 추가하기", image: UIImage(systemName: "rectangle.stack.badge.plus")) { _ in
+                self.addPhotoToAlbum()
             }
         ])
-        // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -47,7 +47,7 @@ class PhotoViewController: UIViewController {
     
     @objc private func selectPhotosStatus() {
         photoSelectStatus = .seletingPhotoStatus
-        isSelectedPhotos = [Bool](repeating: false, count: assets.count)
+        isSelectedPhotos = [Bool](repeating: false, count: assets.count + 1)
         DispatchQueue.main.async { [self] in
             navigationItem.rightBarButtonItem = cancleSelectPhotoButtonItem
             toolbar.isHidden = false
@@ -64,15 +64,19 @@ class PhotoViewController: UIViewController {
     }
     
     @objc private func handlePhotoLibraryDidChange(notification: Notification) {
-        if let asset = notification.object as? PHFetchResult<PHAsset> {
-            self.assets = asset
-        }
         print("photoViewController 변경")
         self.photoCollectionView.reloadData()
     }
     
     @objc private func tapMoreButton() {
         
+    }
+    
+    private func addPhotoToAlbum() {
+        let addPhotoToAlbumViewController = AddPhotoToAlbumViewController()
+        addPhotoToAlbumViewController.assetIdentifiers = selectedPhotoIdentifiers
+        self.cancleSelectStatus()
+        self.present(addPhotoToAlbumViewController, animated: true)
     }
     
     private func deletePhotos() {
@@ -120,6 +124,7 @@ class PhotoViewController: UIViewController {
                 if let cell = self.photoCollectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? PhotosCollectionViewCell {
                     cell.isSelectedPhoto = false
                 }
+                self.isSelectedPhotos[index] = false
             }
         }
         photoSelectStatus = .defaultStatus
@@ -243,6 +248,8 @@ extension PhotoViewController: UICollectionViewDataSource {
             })
         }
         
+        print("===========================")
+        print("\(isSelectedPhotos)", assets.count, indexPath.item)
         if isSelectedPhotos[indexPath.item] == true {
             cell.isSelectedPhoto = true
         } else {

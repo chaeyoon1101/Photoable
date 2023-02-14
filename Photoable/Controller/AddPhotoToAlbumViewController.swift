@@ -12,6 +12,7 @@ class AddPhotoToAlbumViewController: UIViewController {
     
     var assets = [PHAsset]()
     var albums = [AlbumModel]()
+    var assetIdentifiers = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -137,11 +138,6 @@ extension AddPhotoToAlbumViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let albumManager = AlbumManager()
-        var assetIdentifiers = [String]()
-        
-        for asset in assets {
-            assetIdentifiers.append(asset.localIdentifier)
-        }
         
         albumManager.addImages(assetIdentifiers: assetIdentifiers, toAlbum: albums[indexPath.item].title) { result in
             switch result {

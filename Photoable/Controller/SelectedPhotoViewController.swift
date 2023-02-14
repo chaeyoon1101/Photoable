@@ -142,9 +142,9 @@ class SelectedPhotoViewController: UIViewController {
     }
     
     @objc private func handlePhotoLibraryDidChange(notification: Notification) {
-        if let asset = notification.object as? PHFetchResult<PHAsset> {
-            self.assets = asset
-        }
+//        if let asset = notification.object as? PHFetchResult<PHAsset> {
+//            self.assets = asset
+//        }
         
         print("SelectedViewController 변경")
 
@@ -282,6 +282,8 @@ extension SelectedPhotoViewController: PHPhotoLibraryChangeObserver {
         guard let change = changeInstance.changeDetails(for: assets) else {
             return
         }
+        
+        assets = change.fetchResultAfterChanges
         
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: NSNotification.Name("photoLibraryDidChange"), object: change.fetchResultAfterChanges)

@@ -15,6 +15,7 @@ class SelectedPhotoViewController: UIViewController {
     var albumType: String?
     var albumName: String?
     let imageManager = PHCachingImageManager()
+    var isBarsHidden = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -301,6 +302,22 @@ extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionV
         
         collectionView.performBatchUpdates {
             collectionView.moveItem(at: sourceIndexPath, to: destinationIndexPath )
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if isBarsHidden {
+            isBarsHidden = false
+            UIView.animate(withDuration: 0.15) { [self] in
+                navigationController?.navigationBar.layer.opacity = 1
+                toolbar.layer.opacity = 1
+            }
+        } else {
+            isBarsHidden = true
+            UIView.animate(withDuration: 0.15) { [self] in
+                navigationController?.navigationBar.layer.opacity = 0
+                toolbar.layer.opacity = 0
+            }
         }
     }
 }

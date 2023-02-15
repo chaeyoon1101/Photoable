@@ -42,7 +42,7 @@ class PhotoViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         navigationItem.largeTitleDisplayMode = .never
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        
+        navigationController?.navigationBar.layer.opacity = 1
         navigationItem.title = albumName
         photoCollectionView.reloadData()
     }

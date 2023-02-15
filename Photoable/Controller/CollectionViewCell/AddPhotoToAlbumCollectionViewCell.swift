@@ -61,8 +61,10 @@ class AddPhotoToAlbumCollectionViewCell: UICollectionViewCell {
             image.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             titleLabel.topAnchor.constraint(equalTo: image.bottomAnchor, constant: 5),
             titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 5),
+            titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5),
             countLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
             countLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 5),
+            countLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5)
         ])
     }
 }

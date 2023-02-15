@@ -35,7 +35,7 @@ struct AlbumManager {
             }
         }, completionHandler: { (success, error) in
             if success {
-                completion(.success( (album.localIdentifier, assets.count)))
+                completion(.success( (album.localizedTitle ?? "", assets.count)))
             } else {
                 if let error = error {
                     completion(.failure(error))

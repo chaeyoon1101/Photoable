@@ -48,15 +48,19 @@ class AddPhotoToAlbumViewController: UIViewController {
         let createAction = UIAlertAction(title: "생성", style: .default, handler: { action in
             let albumName = alert.textFields?[0].text ?? ""
             self.createAlbum(albumName: albumName)
-            
+            if albumName.count == 0 {
+                DispatchQueue.main.async {
+                    self.showNotificationView(message: "앨범 생성 실패, 앨범의 이름은 1글자 이상으로 해주세요")
+                }
+            }
         })
         
-        alert.addTextField { (inputNewNickName) in
-            inputNewNickName.placeholder = "앨범 이름"
+        alert.addTextField { (inputAlbumName) in
+            inputAlbumName.placeholder = "앨범 이름"
         }
         alert.addAction(cancleAction)
         alert.addAction(createAction)
-        present(alert,animated: true,completion: nil)
+        present(alert, animated: true, completion: nil)
     }
     
     
@@ -64,17 +68,49 @@ class AddPhotoToAlbumViewController: UIViewController {
         albumManager.createAlbum(albumName) { result in
             switch result {
             case .success(let albumName):
-                print("\(albumName) 앨범 삭제 완료")
+                DispatchQueue.main.async {
+                    self.showNotificationView(message: "\(albumName) 앨범 생성 완료")
+                }
             case .failure(let error):
+                DispatchQueue.main.async {
+                    self.showNotificationView(message: "앨범 생성 실패, 오류가 발생했습니다")
+                }
                 print(error.localizedDescription)
             }
         }
     }
+    
     private func configurationCollectionView() {
         albumCollectionView.delegate = self
         albumCollectionView.dataSource = self
         let cellIdentifier = AddPhotoToAlbumCollectionViewCell.identifier
         albumCollectionView.register(AddPhotoToAlbumCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
+    }
+    
+    private func showNotificationView(message: String) {
+        let notificationView = NotificationView()
+        notificationView.frame = CGRect(x: 0, y: -100, width: UIScreen.main.bounds.width, height: 100)
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            let windows = windowScene.windows
+            if let window = windows.first {
+                window.addSubview(notificationView)
+            }
+        }
+        
+        notificationView.messageLabel.text = message
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            notificationView.frame.origin.y += 100
+        })
+            
+        Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+            UIView.animate(withDuration: 0.5, animations: {
+                notificationView.frame.origin.y -= 100
+            }, completion: { _ in
+                notificationView.removeFromSuperview()
+            })
+        }
     }
     
     private lazy var navigationBar: UINavigationBar = {
@@ -97,8 +133,6 @@ class AddPhotoToAlbumViewController: UIViewController {
         return collectionView
     }()
     
-
-    
     private func setUILayout() {
         let views = [navigationBar, albumCollectionView]
         
@@ -115,7 +149,7 @@ class AddPhotoToAlbumViewController: UIViewController {
             albumCollectionView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 20),
             albumCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             albumCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
-            albumCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15)
+            albumCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15),
         ])
     }
 }
@@ -166,14 +200,18 @@ extension AddPhotoToAlbumViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print(assetIdentifiers)
         albumManager.addImages(assetIdentifiers: assetIdentifiers, toAlbum: albums[indexPath.item].identifier) { result in
             switch result {
             case .success((let albumName, let imageCount)):
-                self.dismissViewController()
-                print("\(albumName) 앨범에 사진 \(imageCount)장 추가")
+//                self.dismissViewController()
+                DispatchQueue.main.async {
+                    self.showNotificationView(message: "\(albumName) 앨범에 사진 \(imageCount)장 추가")
+                }
             case .failure(let error):
-                print(error)
+                DispatchQueue.main.async {
+                    self.showNotificationView(message: "사진 추가 실패, 오류가 발생했습니다")
+                }
+                print(error.localizedDescription)
             }
         }
     }

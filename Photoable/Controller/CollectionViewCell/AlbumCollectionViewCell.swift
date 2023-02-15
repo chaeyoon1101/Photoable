@@ -26,6 +26,8 @@ class AlbumCollectionViewCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
+        imageView.layer.backgroundColor = UIColor.black.cgColor
+        
         imageView.layer.borderWidth = 1
         imageView.layer.cornerRadius = 10
         
@@ -80,13 +82,15 @@ class AlbumCollectionViewCell: UICollectionViewCell {
         }
         NSLayoutConstraint.activate([
             image.topAnchor.constraint(equalTo: self.topAnchor),
-            image.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -40),
+            image.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -50),
             image.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
             image.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -10),
             titleLabel.topAnchor.constraint(equalTo: image.bottomAnchor, constant: 5),
             titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 15),
+            titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5),
             countLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
             countLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 15),
+            countLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5),
             deleteButton.topAnchor.constraint(equalTo: self.image.topAnchor, constant: -5),
             deleteButton.leadingAnchor.constraint(equalTo: self.image.leadingAnchor, constant: -5)
         ])

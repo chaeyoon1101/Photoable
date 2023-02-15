@@ -114,6 +114,29 @@ class AlbumViewController: UIViewController {
         changeDeleteButtonsShowing()
     }
     
+    private func showNotificationView(message: String) {
+        let notificationView = NotificationView()
+        notificationView.frame = CGRect(x: 0, y: -100, width: UIScreen.main.bounds.width, height: 100)
+        
+        if let keyWindow = UIApplication.shared.keyWindow {
+            keyWindow.addSubview(notificationView)
+        }
+        
+        notificationView.messageLabel.text = message
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            notificationView.frame.origin.y += 100
+        })
+            
+        Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+            UIView.animate(withDuration: 0.5, animations: {
+                notificationView.frame.origin.y -= 100
+            }, completion: { _ in
+                notificationView.removeFromSuperview()
+            })
+        }
+    }
+    
     private lazy var editBarButtonItem = UIBarButtonItem(title: "편집", style: .done, target: self, action: #selector(tapEditAlbumButton))
     
     private lazy var editCompleteBarButtonItem = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(tapEditCompleteButton))
@@ -140,8 +163,14 @@ class AlbumViewController: UIViewController {
         albumManager.deleteAlbum(identifier: albums[sender.tag].identifier) { result in
             switch result {
             case .success(let albumName):
+                DispatchQueue.main.async {
+                    self.showNotificationView(message: "\(albumName) 앨범 삭제 완료")
+                }
                 print("\(albumName) 앨범 삭제 완료")
             case .failure(let error):
+                DispatchQueue.main.async {
+                    self.showNotificationView(message: "앨범 삭제 실패, 오류가 발생했습니다.")
+                }
                 print("\(error.localizedDescription)")
             }
         }

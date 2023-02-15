@@ -69,6 +69,32 @@ class SelectedPhotoViewController: UIViewController {
         toolbar.setItems(items, animated: true)
     }
     
+    private func showNotificationView(message: String) {
+        let notificationView = NotificationView()
+        notificationView.frame = CGRect(x: 0, y: -100, width: UIScreen.main.bounds.width, height: 100)
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            let windows = windowScene.windows
+            if let window = windows.first {
+                window.addSubview(notificationView)
+            }
+        }
+        
+        notificationView.messageLabel.text = message
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            notificationView.frame.origin.y += 100
+        })
+            
+        Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+            UIView.animate(withDuration: 0.5, animations: {
+                notificationView.frame.origin.y -= 100
+            }, completion: { _ in
+                notificationView.removeFromSuperview()
+            })
+        }
+    }
+    
     @objc private func tapShareButton() {
         
     }
@@ -106,7 +132,13 @@ class SelectedPhotoViewController: UIViewController {
                     switch result {
                     case .success((let albumName, let deletedImageCount)):
                         print("사진 \(deletedImageCount)장 \(albumName) 앨범에서 삭제 완료")
+                        DispatchQueue.main.async {
+                            self.showNotificationView(message: "사진 \(deletedImageCount)장 \(albumName) 앨범에서 삭제 완료")
+                        }
                     case .failure(let error):
+                        DispatchQueue.main.async {
+                            self.showNotificationView(message: "사진 삭제 실패, 오류가 발생했습니다.")
+                        }
                         print(error)
                     }
                 }
@@ -118,7 +150,13 @@ class SelectedPhotoViewController: UIViewController {
                 switch result {
                 case .success(let deletedImageCount):
                     print("사진 \(deletedImageCount)장 삭제 완료")
+                    DispatchQueue.main.async {
+                        self.showNotificationView(message: "사진 \(deletedImageCount)장 삭제 완료")
+                    }
                 case .failure(let error):
+                    DispatchQueue.main.async {
+                        self.showNotificationView(message: "사진 삭제 실패, 오류가 발생했습니다.")
+                    }
                     print(error.localizedDescription)
                 }
             }
@@ -142,12 +180,7 @@ class SelectedPhotoViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
-    @objc private func handlePhotoLibraryDidChange(notification: Notification) {
-//        if let asset = notification.object as? PHFetchResult<PHAsset> {
-//            self.assets = asset
-//        }
-        
-        print("SelectedViewController 변경")
+    @objc private func handlePhotoLibraryDidChange(notification: Notification) { print("SelectedViewController 변경")
 
         self.photoCollectionView.reloadData()
     }
@@ -169,7 +202,7 @@ class SelectedPhotoViewController: UIViewController {
             
             toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             toolbar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            toolbar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+            toolbar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
         ])
     }
     

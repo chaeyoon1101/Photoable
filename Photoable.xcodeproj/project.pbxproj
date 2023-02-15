@@ -17,6 +17,7 @@
 		2B431678299A8EA200199381 /* PhotoSelectStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B431677299A8EA200199381 /* PhotoSelectStatus.swift */; };
 		2B43167A299B8FCB00199381 /* AlbumEditStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B431679299B8FCB00199381 /* AlbumEditStatus.swift */; };
 		2B43167C299B960800199381 /* AddPhotoToAlbumCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B43167B299B960800199381 /* AddPhotoToAlbumCollectionViewCell.swift */; };
+		2B43167E299B9FE600199381 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B43167D299B9FE600199381 /* NotificationView.swift */; };
 		2B5016AD2952068400547019 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016AC2952068400547019 /* AppDelegate.swift */; };
 		2B5016AF2952068400547019 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016AE2952068400547019 /* SceneDelegate.swift */; };
 		2B5016B12952068400547019 /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5016B02952068400547019 /* PhotoViewController.swift */; };
@@ -42,6 +43,7 @@
 		2B431677299A8EA200199381 /* PhotoSelectStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoSelectStatus.swift; sourceTree = "<group>"; };
 		2B431679299B8FCB00199381 /* AlbumEditStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumEditStatus.swift; sourceTree = "<group>"; };
 		2B43167B299B960800199381 /* AddPhotoToAlbumCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPhotoToAlbumCollectionViewCell.swift; sourceTree = "<group>"; };
+		2B43167D299B9FE600199381 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		2B5016A92952068400547019 /* Photoable.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photoable.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B5016AC2952068400547019 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B5016AE2952068400547019 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 			children = (
 				2B5016B72952068600547019 /* LaunchScreen.storyboard */,
 				2B5A5B54298FC4E50081CF56 /* PhotoCreateDateView.swift */,
+				2B43167D299B9FE600199381 /* NotificationView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 				2B5A5B55298FC4E50081CF56 /* PhotoCreateDateView.swift in Sources */,
 				2B5A5B50298F96C60081CF56 /* SelectedPhotoViewController.swift in Sources */,
 				2B431674299A43B700199381 /* AddPhotoToAlbumViewController.swift in Sources */,
+				2B43167E299B9FE600199381 /* NotificationView.swift in Sources */,
 				2B5016B12952068400547019 /* PhotoViewController.swift in Sources */,
 				2B431672299A2FA500199381 /* AlbumManager.swift in Sources */,
 				2B5A5B53298FBE3E0081CF56 /* Extension+Date.swift in Sources */,

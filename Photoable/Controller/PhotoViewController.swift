@@ -87,11 +87,17 @@ class PhotoViewController: UIViewController {
         
         if albumType == "userAlbum" {
             actions.append(AlertModel(title: "앨범에서 제거", style: .default, handler: { [self] _ in
-                albumManager.removeImages(assetIdentifiers: selectedPhotoIdentifiers, toAlbum: albumName ?? "이름 없음") { result in
+                albumManager.removeImages(assetIdentifiers: selectedPhotoIdentifiers, toAlbum: albumIdentifier ?? "이름 없음") { result in
                     switch result {
                     case .success((let albumName, let deletedImageCount)):
+                        DispatchQueue.main.async {
+                            self.showNotificationView(message: "사진 \(deletedImageCount)장 \(albumName) 앨범에서 삭제 완료")
+                        }
                         print("사진 \(deletedImageCount)장 \(albumName) 앨범에서 삭제 완료")
                     case .failure(let error):
+                        DispatchQueue.main.async {
+                            self.showNotificationView(message: "사진 삭제 실패, 오류가 발생했습니다")
+                        }
                         print(error)
                     }
                     self.cancleSelectStatus()
@@ -103,8 +109,14 @@ class PhotoViewController: UIViewController {
             imageManager.deleteImages(assetIdentifiers: selectedPhotoIdentifiers) { result in
                 switch result {
                 case .success(let deletedImageCount):
+                    DispatchQueue.main.async {
+                        self.showNotificationView(message: "사진 \(deletedImageCount)장 삭제 완료")
+                    }
                     print("사진 \(deletedImageCount)장 삭제 완료")
                 case .failure(let error):
+                    DispatchQueue.main.async {
+                        self.showNotificationView(message: "사진 삭제 실패, 오류가 발생했습니다")
+                    }
                     print(error.localizedDescription)
                 }
                 self.cancleSelectStatus()
@@ -164,6 +176,32 @@ class PhotoViewController: UIViewController {
         self.toolbar.setItems(items, animated: true)
     }
     
+    private func showNotificationView(message: String) {
+        let notificationView = NotificationView()
+        notificationView.frame = CGRect(x: 0, y: -100, width: UIScreen.main.bounds.width, height: 100)
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            let windows = windowScene.windows
+            if let window = windows.first {
+                window.addSubview(notificationView)
+            }
+        }
+        
+        notificationView.messageLabel.text = message
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            notificationView.frame.origin.y += 100
+        })
+            
+        Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
+            UIView.animate(withDuration: 0.5, animations: {
+                notificationView.frame.origin.y -= 100
+            }, completion: { _ in
+                notificationView.removeFromSuperview()
+            })
+        }
+    }
+    
     private lazy var selectPhotoButtonItem = UIBarButtonItem(title: "사진 선택", style: .done, target: self, action: #selector(selectPhotosStatus))
     
     private lazy var cancleSelectPhotoButtonItem = UIBarButtonItem(title: "취소", style: .done, target: self, action: #selector(cancleSelectStatus))
@@ -212,7 +250,7 @@ class PhotoViewController: UIViewController {
             photoCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             toolbar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            toolbar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+            toolbar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
         ])
     }
 }

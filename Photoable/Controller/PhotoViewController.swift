@@ -1,10 +1,3 @@
-//
-//  ViewController.swift
-//  Photoable
-//
-//  Created by 임채윤 on 2022/12/21.
-//
-
 import UIKit
 import PhotosUI
 
@@ -158,21 +151,16 @@ class PhotoViewController: UIViewController {
         let moreButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: moreButtonMenu)
         
         if selectedPhotoIdentifiers.count == 0 {
-            
             self.toolBarTitleLabel.text = "사진 선택"
-            
             moreButton.isEnabled = false
         } else {
-            
             self.toolBarTitleLabel.text = "\(self.selectedPhotoIdentifiers.count)장의 사진이 선택됨"
-            
             moreButton.isEnabled = true
         }
         
         let titleView = UIBarButtonItem(customView: toolBarTitleLabel)
         let fiexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let items = [fiexibleSpace, titleView, fiexibleSpace, moreButton]
-        
         
         self.toolbar.setItems(items, animated: true)
     }
@@ -205,7 +193,7 @@ class PhotoViewController: UIViewController {
         UIView.animate(withDuration: 0.5, animations: {
             notificationView.frame.origin.y += 100
         })
-            
+        
         Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
             UIView.animate(withDuration: 0.5, animations: {
                 notificationView.frame.origin.y -= 100
@@ -255,7 +243,6 @@ class PhotoViewController: UIViewController {
             self.view.addSubview(view)
         }
         
-        print("====== Set UI layout ======")
         NSLayoutConstraint.activate([
             photoCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             photoCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),

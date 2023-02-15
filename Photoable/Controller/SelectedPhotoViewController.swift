@@ -1,12 +1,5 @@
-//
-//  SelectedPhotoViewController.swift
-//  Photoable
-//
-//  Created by 임채윤 on 2023/02/05.
-//
-
 import UIKit
-import PhotosUI
+import Photos
 
 class SelectedPhotoViewController: UIViewController {
     var assets = PHFetchResult<PHAsset>()
@@ -26,8 +19,6 @@ class SelectedPhotoViewController: UIViewController {
         PHPhotoLibrary.shared().register(self)
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
-        
-        // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -53,11 +44,11 @@ class SelectedPhotoViewController: UIViewController {
         self.navigationItem.rightBarButtonItem = rightButton
         
         let appearence = UINavigationBarAppearance()
-
+        
         navigationController?.navigationBar.scrollEdgeAppearance = appearence
         navigationController?.isNavigationBarHidden = false
     }
-
+    
     private func setToolbar(isFavorite: Bool) {
         let shareButton = UIBarButtonItem(image: UIImage(systemName: "arrowshape.turn.up.forward"), style: .plain, target: self, action: #selector(tapShareButton))
         let favoriteButton = UIBarButtonItem(image: UIImage(systemName: isFavorite ? "heart.fill" : "heart"), style: .plain, target: self, action: #selector(tapFavoriteButton))
@@ -98,7 +89,7 @@ class SelectedPhotoViewController: UIViewController {
         UIView.animate(withDuration: 0.5, animations: {
             notificationView.frame.origin.y += 100
         })
-            
+        
         Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
             UIView.animate(withDuration: 0.5, animations: {
                 notificationView.frame.origin.y -= 100
@@ -132,7 +123,7 @@ class SelectedPhotoViewController: UIViewController {
             }
         })
     }
-                                           
+    
     @objc private func tapDeleteButton() {
         var actions = [AlertModel]()
         let imageManager = ImageManager()
@@ -194,7 +185,6 @@ class SelectedPhotoViewController: UIViewController {
     }
     
     @objc private func handlePhotoLibraryDidChange(notification: Notification) { print("SelectedViewController 변경")
-
         self.photoCollectionView.reloadData()
     }
     
@@ -271,7 +261,7 @@ extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionV
             }
         } else {
             let thumbnailSize = CGSize(width: 1024 * UIScreen.main.scale, height: 1024 * UIScreen.main.scale)
-
+            
             imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
                 if cell.representedAssetIdentifier == asset.localIdentifier {
                     DispatchQueue.main.async {
@@ -293,7 +283,6 @@ extension SelectedPhotoViewController: UICollectionViewDataSource, UICollectionV
         photoIndex = Int(targetContentOffset.pointee.x / view.frame.width)
         setToolbar(isFavorite: assets[photoIndex].isFavorite)
         self.setNavigationBar()
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
@@ -347,6 +336,7 @@ extension SelectedPhotoViewController: PHPhotoLibraryChangeObserver {
         }
         
         assets = change.fetchResultAfterChanges
+        
         if assets.count == 0 {
             DispatchQueue.main.async {
                 self.navigationController?.popViewController(animated: true)

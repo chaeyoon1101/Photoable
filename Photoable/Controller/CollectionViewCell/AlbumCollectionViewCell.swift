@@ -1,16 +1,9 @@
-//
-//  AlbumCollectionViewCell.swift
-//  Photoable
-//
-//  Created by 임채윤 on 2023/02/13.
-//
-
 import UIKit
 
 class AlbumCollectionViewCell: UICollectionViewCell {
     static let identifier = "AlbumCollectionViewCell"
     var representedAssetIdentifier: String?
-
+    
     var isEditingView: Bool? {
         didSet {
             if isEditingView == true {
@@ -63,14 +56,14 @@ class AlbumCollectionViewCell: UICollectionViewCell {
     }()
     
     override init(frame: CGRect) {
-       super.init(frame: frame)
+        super.init(frame: frame)
         isEditingView = false
-       self.setUILayout()
-   }
-   
-   required init?(coder: NSCoder) {
-       fatalError("init(coder:) has not been implemented")
-   }
+        self.setUILayout()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private func setUILayout() {
         let views = [imageView, titleLabel, countLabel, deleteButton]
@@ -79,6 +72,7 @@ class AlbumCollectionViewCell: UICollectionViewCell {
             view.translatesAutoresizingMaskIntoConstraints = false
             self.addSubview(view)
         }
+        
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: self.topAnchor),
             imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -50),

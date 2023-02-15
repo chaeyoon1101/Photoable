@@ -1,14 +1,7 @@
-//
-//  AlertAnimationView.swift
-//  Photoable
-//
-//  Created by 임채윤 on 2023/02/14.
-//
-
 import UIKit
 
 class NotificationView: UIView {
-
+    
     let messageLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
@@ -39,6 +32,4 @@ class NotificationView: UIView {
             messageLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20)
         ])
     }
-    
-
 }

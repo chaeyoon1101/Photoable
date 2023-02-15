@@ -1,10 +1,3 @@
-//
-//  Extension+Date.swift
-//  Photoable
-//
-//  Created by 임채윤 on 2023/02/05.
-//
-
 import Foundation
 
 extension Date {

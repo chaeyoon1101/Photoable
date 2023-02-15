@@ -1,10 +1,3 @@
-//
-//  AddPhotoToAlbumCollectionViewCell.swift
-//  Photoable
-//
-//  Created by 임채윤 on 2023/02/14.
-//
-
 import UIKit
 
 class AddPhotoToAlbumCollectionViewCell: UICollectionViewCell {
@@ -39,13 +32,13 @@ class AddPhotoToAlbumCollectionViewCell: UICollectionViewCell {
     }()
     
     override init(frame: CGRect) {
-       super.init(frame: frame)
-       self.setUILayout()
-   }
-   
-   required init?(coder: NSCoder) {
-       fatalError("init(coder:) has not been implemented")
-   }
+        super.init(frame: frame)
+        self.setUILayout()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private func setUILayout() {
         let views = [imageView, titleLabel, countLabel]
@@ -54,6 +47,7 @@ class AddPhotoToAlbumCollectionViewCell: UICollectionViewCell {
             view.translatesAutoresizingMaskIntoConstraints = false
             self.addSubview(view)
         }
+        
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: self.topAnchor),
             imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -40),

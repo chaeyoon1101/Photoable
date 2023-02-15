@@ -1,10 +1,3 @@
-//
-//  AddPhotoToAlbumViewController.swift
-//  Photoable
-//
-//  Created by 임채윤 on 2023/02/13.
-//
-
 import UIKit
 import Photos
 
@@ -22,7 +15,6 @@ class AddPhotoToAlbumViewController: UIViewController {
         PHPhotoLibrary.shared().register(self)
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
         self.view.backgroundColor = .systemBackground
-        // Do any additional setup after loading the view.
     }
     
     private func fetchAlbum() {
@@ -114,7 +106,7 @@ class AddPhotoToAlbumViewController: UIViewController {
         UIView.animate(withDuration: 0.5, animations: {
             notificationView.frame.origin.y += 100
         })
-            
+        
         Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
             UIView.animate(withDuration: 0.5, animations: {
                 notificationView.frame.origin.y -= 100
@@ -136,7 +128,7 @@ class AddPhotoToAlbumViewController: UIViewController {
         
         return navigationBar
     }()
-
+    
     let albumCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -152,7 +144,6 @@ class AddPhotoToAlbumViewController: UIViewController {
             self.view.addSubview(view)
         }
         
-        print("====== Set UI layout ======")
         NSLayoutConstraint.activate([
             navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -214,7 +205,6 @@ extension AddPhotoToAlbumViewController: UICollectionViewDataSource {
         albumManager.addImages(assetIdentifiers: assetIdentifiers, toAlbum: albums[indexPath.item].identifier) { result in
             switch result {
             case .success((let albumName, let imageCount)):
-//                self.dismissViewController()
                 DispatchQueue.main.async {
                     self.showNotificationView(message: "\(albumName) 앨범에 사진 \(imageCount)장 추가")
                 }
@@ -253,4 +243,3 @@ extension AddPhotoToAlbumViewController: PHPhotoLibraryChangeObserver {
         }
     }
 }
-

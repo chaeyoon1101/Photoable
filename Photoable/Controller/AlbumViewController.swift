@@ -2,7 +2,7 @@ import UIKit
 import Photos
 
 class AlbumViewController: UIViewController {
-
+    
     var albums = [AlbumModel]()
     var albumEditStatus: AlbumEditStatus = .defaultStatus
     let albumManager = AlbumManager()
@@ -16,7 +16,6 @@ class AlbumViewController: UIViewController {
         navigationController?.navigationBar.backgroundColor = .secondarySystemBackground
         PHPhotoLibrary.shared().register(self)
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)
-        // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -63,7 +62,7 @@ class AlbumViewController: UIViewController {
                     DispatchQueue.main.async {
                         self.alert(title: "사진 접근 권한", message: "사진 접근 권한이 허용 되지 않았어요", actions: actions)
                     }
-                   
+                    
                 case .denied:
                     let actions = [
                         AlertModel(title: "설정 변경하러 가기", style: .default, handler: { _ in
@@ -76,7 +75,7 @@ class AlbumViewController: UIViewController {
                     DispatchQueue.main.async {
                         self.alert(title: "사진 접근 권한", message: "사진 접근 권한이 거부 되었어요", actions: actions)
                     }
-                
+                    
                 @unknown default:
                     break
                 }
@@ -94,7 +93,7 @@ class AlbumViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
         navigationItem.title = "나의 앨범"
-//        let settingBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gearshape.fill"), style: .plain, target: self, action: nil)
+        //        let settingBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gearshape.fill"), style: .plain, target: self, action: nil)
         navigationItem.rightBarButtonItems = [editBarButtonItem]
     }
     
@@ -141,7 +140,7 @@ class AlbumViewController: UIViewController {
         UIView.animate(withDuration: 0.5, animations: {
             notificationView.frame.origin.y += 100
         })
-            
+        
         Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { _ in
             UIView.animate(withDuration: 0.5, animations: {
                 notificationView.frame.origin.y -= 100
@@ -157,7 +156,7 @@ class AlbumViewController: UIViewController {
     
     let albumCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-
+        
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         
         return collectionView
@@ -206,7 +205,6 @@ class AlbumViewController: UIViewController {
             self.view.addSubview(view)
         }
         
-        print("====== Set UI layout ======")
         NSLayoutConstraint.activate([
             albumCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             albumCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),

@@ -1,11 +1,3 @@
-//
-//  AlbumManager.swift
-//  Photoable
-//
-//  Created by 임채윤 on 2023/02/13.
-//
-
-import Foundation
 import Photos
 import UIKit
 
@@ -142,6 +134,4 @@ struct AlbumManager {
             }
         })
     }
-    
-    
 }

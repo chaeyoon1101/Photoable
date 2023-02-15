@@ -69,9 +69,21 @@ class SelectedPhotoViewController: UIViewController {
         toolbar.setItems(items, animated: true)
     }
     
+    @objc func removeNotificationView(sender: UIGestureRecognizer) {
+        guard let notificationView = sender.view else {
+            return
+        }
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            notificationView.frame.origin.y -= 100
+        })
+    }
+    
     private func showNotificationView(message: String) {
         let notificationView = NotificationView()
         notificationView.frame = CGRect(x: 0, y: -100, width: UIScreen.main.bounds.width, height: 100)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(removeNotificationView))
+        notificationView.addGestureRecognizer(tapGesture)
         
         if let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
             let windows = windowScene.windows

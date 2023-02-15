@@ -271,7 +271,7 @@ extension PhotoViewController: UICollectionViewDataSource {
         
         if let cachedImage = ImageCache.shared.image(forKey: asset.localIdentifier) {
             DispatchQueue.main.async {
-                cell.image.image = cachedImage
+                cell.imageView.image = cachedImage
             }
         } else {
             let thumbnailSize = CGSize(width: 1024 * UIScreen.main.scale, height: 1024 * UIScreen.main.scale)
@@ -279,7 +279,7 @@ extension PhotoViewController: UICollectionViewDataSource {
             imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
                 if cell.representedAssetIdentifier == asset.localIdentifier {
                     DispatchQueue.main.async {
-                        cell.image.image = image
+                        cell.imageView.image = image
                     }
                     ImageCache.shared.setImage(image, forKey: asset.localIdentifier)
                 }

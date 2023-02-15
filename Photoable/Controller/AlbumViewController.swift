@@ -154,6 +154,7 @@ class AlbumViewController: UIViewController {
             DispatchQueue.main.async {
                 if let cell = self.albumCollectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? AlbumCollectionViewCell {
                     cell.isEditingView = self.albumEditStatus == .editingStatus && self.albums[index].albumType == "userAlbum" ? true : false
+                    cell.imageView.layer.opacity = self.albumEditStatus == .editingStatus ? 0.5 : 1
                 }
             }
         }
@@ -223,24 +224,24 @@ extension AlbumViewController: UICollectionViewDataSource {
         guard let asset = album.asset.firstObject else {
             let emptyAlbumImage = UIImage(systemName: "photo.on.rectangle.angled")?.withRenderingMode(.alwaysTemplate)
             
-            cell.image.tintColor = .secondaryLabel
-            cell.image.image = emptyAlbumImage
-            cell.image.contentMode = .scaleAspectFit
+            cell.imageView.tintColor = .secondaryLabel
+            cell.imageView.image = emptyAlbumImage
+            cell.imageView.contentMode = .scaleAspectFit
             
             return cell
         }
         
-        cell.image.contentMode = .scaleAspectFill
+        cell.imageView.contentMode = .scaleAspectFill
         let imageManager = ImageManager()
         
         if let cachedImage = ImageCache.shared.image(forKey: asset.localIdentifier) {
             DispatchQueue.main.async {
-                cell.image.image = cachedImage
+                cell.imageView.image = cachedImage
             }
         } else {
             DispatchQueue.main.async {
                 imageManager.fetchImage(asset: asset, cellIdentifier: asset.localIdentifier, completion: { image in
-                    cell.image.image = image
+                    cell.imageView.image = image
                 })
             }
         }

@@ -13,7 +13,7 @@ class SelectedPhotosCollectionViewCell: UICollectionViewCell {
     static let identifier = "SelectedPhotosCollectionViewCell"
     var representedAssetIdentifier: String?
     
-    let image: UIImageView = {
+    let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -32,7 +32,7 @@ class SelectedPhotosCollectionViewCell: UICollectionViewCell {
     }
     
     private func setUILayout() {
-        let views = [image]
+        let views = [imageView]
 
         views.forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -40,10 +40,10 @@ class SelectedPhotosCollectionViewCell: UICollectionViewCell {
         }
 
         NSLayoutConstraint.activate([
-            image.topAnchor.constraint(equalTo: self.topAnchor),
-            image.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            image.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            image.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+            imageView.topAnchor.constraint(equalTo: self.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            imageView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
         ])
     }
 }

@@ -11,7 +11,7 @@ class AddPhotoToAlbumCollectionViewCell: UICollectionViewCell {
     static let identifier = "AddPhotoToAlbumCollectionViewCell"
     var representedAssetIdentifier: String?
     
-    var image: UIImageView = {
+    var imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -48,18 +48,18 @@ class AddPhotoToAlbumCollectionViewCell: UICollectionViewCell {
    }
     
     private func setUILayout() {
-        let views = [image, titleLabel, countLabel]
+        let views = [imageView, titleLabel, countLabel]
         
         views.forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
             self.addSubview(view)
         }
         NSLayoutConstraint.activate([
-            image.topAnchor.constraint(equalTo: self.topAnchor),
-            image.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -40),
-            image.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            image.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            titleLabel.topAnchor.constraint(equalTo: image.bottomAnchor, constant: 5),
+            imageView.topAnchor.constraint(equalTo: self.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -40),
+            imageView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 5),
             titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 5),
             titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5),
             countLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),

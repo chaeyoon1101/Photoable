@@ -15,16 +15,19 @@ class PhotosCollectionViewCell: UICollectionViewCell {
         didSet {
             if isSelectedPhoto == true {
                 selectMark.isHidden = false
+                imageView.layer.opacity = 0.5
             } else {
                 selectMark.isHidden = true
+                imageView.layer.opacity = 1
             }
         }
     }
     
-    let image: UIImageView = {
+    let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.layer.backgroundColor = UIColor.black.cgColor
         
         return imageView
     }()
@@ -51,7 +54,7 @@ class PhotosCollectionViewCell: UICollectionViewCell {
    }
     
     private func setUILayout() {
-        let views = [image, selectMark]
+        let views = [imageView, selectMark]
         
         views.forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -59,10 +62,10 @@ class PhotosCollectionViewCell: UICollectionViewCell {
         }
         
         NSLayoutConstraint.activate([
-            image.topAnchor.constraint(equalTo: self.topAnchor),
-            image.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            image.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            image.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            imageView.topAnchor.constraint(equalTo: self.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            imageView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             selectMark.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
             selectMark.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
         ])

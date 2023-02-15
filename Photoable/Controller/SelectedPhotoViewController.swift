@@ -330,6 +330,11 @@ extension SelectedPhotoViewController: PHPhotoLibraryChangeObserver {
         }
         
         assets = change.fetchResultAfterChanges
+        if assets.count == 0 {
+            DispatchQueue.main.async {
+                self.navigationController?.popViewController(animated: true)
+            }
+        }
         
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: NSNotification.Name("photoLibraryDidChange"), object: change.fetchResultAfterChanges)

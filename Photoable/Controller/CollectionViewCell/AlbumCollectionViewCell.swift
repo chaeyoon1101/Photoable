@@ -28,9 +28,8 @@ class AlbumCollectionViewCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
-        imageView.layer.backgroundColor = UIColor.black.cgColor
+        imageView.layer.backgroundColor = UIColor.secondarySystemBackground.cgColor
         
-        imageView.layer.borderWidth = 1
         imageView.layer.cornerRadius = 10
         
         return imageView
@@ -54,12 +53,10 @@ class AlbumCollectionViewCell: UICollectionViewCell {
     
     lazy var deleteButton: UIButton = {
         let button = UIButton(type: .system)
-        let imageConfig = UIImage.SymbolConfiguration(pointSize: 18, weight: .light)
+        let imageConfig = UIImage.SymbolConfiguration(pointSize: 20, weight: .light)
         
         button.setImage(UIImage(systemName: "minus.circle.fill", withConfiguration: imageConfig), for: .normal)
         button.tintColor = .red
-        button.backgroundColor = .label
-        button.layer.cornerRadius = 10.5
         button.isHidden = true
         
         return button
@@ -93,8 +90,8 @@ class AlbumCollectionViewCell: UICollectionViewCell {
             countLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
             countLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 15),
             countLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5),
-            deleteButton.topAnchor.constraint(equalTo: self.imageView.topAnchor, constant: -5),
-            deleteButton.leadingAnchor.constraint(equalTo: self.imageView.leadingAnchor, constant: -5)
+            deleteButton.topAnchor.constraint(equalTo: self.imageView.topAnchor, constant: -10),
+            deleteButton.leadingAnchor.constraint(equalTo: self.imageView.leadingAnchor, constant: -10)
         ])
     }
 }

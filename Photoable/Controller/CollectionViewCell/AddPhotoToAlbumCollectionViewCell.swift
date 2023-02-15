@@ -16,7 +16,7 @@ class AddPhotoToAlbumCollectionViewCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
-        imageView.layer.borderWidth = 1
+        imageView.layer.backgroundColor = UIColor.secondarySystemBackground.cgColor
         imageView.layer.cornerRadius = 10
         
         return imageView

@@ -25,6 +25,7 @@ class PhotoViewController: UIViewController {
         configurationCollectionView()
         setToolbar()
         isSelectedPhotos = [Bool](repeating: false, count: assets.count)
+        view.backgroundColor = .secondarySystemBackground
         navigationItem.rightBarButtonItem = selectPhotoButtonItem
         PHPhotoLibrary.shared().register(self)
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoLibraryDidChange), name: NSNotification.Name("photoLibraryDidChange"), object: nil)

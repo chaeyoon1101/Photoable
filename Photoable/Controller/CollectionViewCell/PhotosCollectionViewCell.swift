@@ -27,7 +27,7 @@ class PhotosCollectionViewCell: UICollectionViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.backgroundColor = UIColor.black.cgColor
+        imageView.layer.backgroundColor = UIColor.systemBackground.cgColor
         
         return imageView
     }()
@@ -36,7 +36,7 @@ class PhotosCollectionViewCell: UICollectionViewCell {
         let imageView = UIImageView()
         imageView.frame.size = CGSize(width: 20, height: 20)
         imageView.image = UIImage(systemName: "checkmark.circle.fill")
-        imageView.backgroundColor = .label
+        imageView.backgroundColor = .white
         imageView.layer.cornerRadius = imageView.frame.height / 2
         imageView.clipsToBounds = true
         imageView.isHidden = true

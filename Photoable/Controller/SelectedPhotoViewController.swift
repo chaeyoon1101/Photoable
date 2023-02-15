@@ -37,11 +37,9 @@ class SelectedPhotoViewController: UIViewController {
     }
     
     private func setNavigationBar() {
-        let rightButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), style: .plain, target: self, action: nil)
         let photoCreateDateView = PhotoCreateDateView()
         photoCreateDateView.setLabel(date: assets[photoIndex].creationDate)
         self.navigationItem.titleView = photoCreateDateView
-        self.navigationItem.rightBarButtonItem = rightButton
         
         let appearence = UINavigationBarAppearance()
         

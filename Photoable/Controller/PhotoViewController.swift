@@ -363,11 +363,20 @@ extension PhotoViewController: PHPhotoLibraryChangeObserver {
 
 extension PhotoViewController {
     private func alert(title: String, message: String, actions: [AlertModel] = []) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
-        actions.forEach { action in
-            alert.addAction(UIAlertAction(title: action.title, style: action.style, handler: action.handler))
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+            actions.forEach { action in
+                alert.addAction(UIAlertAction(title: action.title, style: action.style, handler: action.handler))
+            }
+            
+            present(alert, animated: true)
+        } else {
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            actions.forEach { action in
+                alert.addAction(UIAlertAction(title: action.title, style: action.style, handler: action.handler))
+            }
+            
+            present(alert, animated: true)
         }
-        
-        present(alert, animated: true)
     }
 }

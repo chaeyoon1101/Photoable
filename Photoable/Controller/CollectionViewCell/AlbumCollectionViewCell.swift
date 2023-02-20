@@ -74,8 +74,8 @@ class AlbumCollectionViewCell: UICollectionViewCell {
         }
         
         NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: self.topAnchor),
-            imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -50),
+            imageView.topAnchor.constraint(equalTo: self.topAnchor, constant: 10),
+            imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -40),
             imageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
             imageView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -10),
             titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 5),
